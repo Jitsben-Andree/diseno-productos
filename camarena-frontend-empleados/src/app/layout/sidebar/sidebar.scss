@@ -1,0 +1,28 @@
+// Estilos para el sidebar
+:host {
+  display: block;
+  height: 100%;
+}
+
+.active-menu-item {
+  background-color: theme('colors.blue.800');
+  border-left: 4px solid theme('colors.verde-esmeralda');
+}
+
+// Scrollbar personalizado
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.blue.900');
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.verde-esmeralda');
+  border-radius: 5px;
+  
+  &:hover {
+    background: theme('colors.emerald.600');
+  }
+}

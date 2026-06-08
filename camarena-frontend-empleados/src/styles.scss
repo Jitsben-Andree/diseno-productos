@@ -1,0 +1,34 @@
+/* ==========================================================================
+   1. DEFINICIÓN DE CAPAS (Requerido por PrimeNG v18)
+   ========================================================================== */
+@layer tailwind-base, primeng, tailwind-utilities;
+
+/* Inyectamos Tailwind dentro de sus capas correspondientes */
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
+
+/* ==========================================================================
+   2. PRIMEICONS
+   ========================================================================== */
+@import "primeicons/primeicons.css";
+
+/* ==========================================================================
+   3. ESTILOS GLOBALES
+   ========================================================================== */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: theme('colors.gris-fondo');
+}
+
+.p-sidebar {
+    background-color: theme('colors.azul-clinico');
+    color: white;
+}

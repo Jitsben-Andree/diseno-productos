@@ -1,0 +1,140 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Punto de Venta / Recepción</h1>
+    <p class="text-gray-500 text-sm">Genere nuevas órdenes y registre pagos.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- COLUMNA IZQUIERDA: Búsqueda y Catálogo -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- 1. Buscador de Paciente -->
+      <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">1. Identificar Paciente</h2>
+        
+        <div class="flex space-x-2">
+          <input type="text" [(ngModel)]="dniBusqueda" placeholder="Ingrese el DNI del paciente..." class="flex-1 px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none" (keyup.enter)="buscarPaciente()">
+          <button (click)="buscarPaciente()" [disabled]="buscandoPaciente" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors disabled:bg-blue-400 flex items-center">
+            <i class="pi pi-search mr-2"></i> Buscar
+          </button>
+        </div>
+
+        <!-- Resultado de la búsqueda -->
+        <div *ngIf="errorPaciente" class="mt-3 text-red-500 text-sm flex items-center">
+          <i class="pi pi-exclamation-circle mr-1"></i> {{ errorPaciente }}
+        </div>
+        
+        <div *ngIf="pacienteActual" class="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between">
+          <div>
+            <p class="text-xs text-blue-500 uppercase font-bold tracking-wider">Paciente Encontrado</p>
+            <p class="text-lg font-bold text-gray-800">{{ pacienteActual.nombres }} {{ pacienteActual.apellidos }}</p>
+            <p class="text-sm text-gray-600">DNI: {{ pacienteActual.dni }}</p>
+          </div>
+          <button (click)="limpiarPaciente()" class="text-gray-400 hover:text-red-500 transition-colors">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Catálogo de Exámenes -->
+      <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100" [class.opacity-50]="!pacienteActual">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">2. Agregar Exámenes</h2>
+        
+        <!-- Lista de Exámenes Disponibles -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
+          <div *ngFor="let examen of catalogoExamenes" 
+               class="border border-gray-200 p-3 rounded hover:border-blue-500 cursor-pointer transition-colors flex justify-between items-center group"
+               (click)="agregarAlCarrito(examen)">
+            <div>
+              <p class="font-medium text-gray-800 group-hover:text-blue-600">{{ examen.descripcion }}</p>
+              <p class="text-xs text-gray-500">Tubo: {{ examen.tipoTuboDefecto }}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-gray-800">S/ {{ examen.precioBase }}</p>
+              <p class="text-xs text-blue-500 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Agregar +</p>
+            </div>
+          </div>
+          <div *ngIf="catalogoExamenes.length === 0" class="col-span-2 text-center text-gray-500 py-4">
+            Cargando catálogo...
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA DERECHA: Carrito y Cobro -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex flex-col h-fit sticky top-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Resumen de Orden</h2>
+      
+      <!-- Lista del Carrito -->
+      <div class="flex-1 min-h-[200px]">
+        <div *ngIf="carrito.length === 0" class="h-full flex flex-col items-center justify-center text-gray-400 py-10">
+          <i class="pi pi-shopping-cart text-4xl mb-2"></i>
+          <p class="text-sm">El carrito está vacío</p>
+        </div>
+
+        <ul class="space-y-3">
+          <li *ngFor="let item of carrito; let i = index" class="flex justify-between items-center text-sm border-b border-gray-50 pb-2">
+            <div class="flex-1">
+              <p class="font-medium text-gray-800">{{ item.descripcion }}</p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="font-semibold text-gray-700">S/ {{ item.precioBase }}</span>
+              <button (click)="quitarDelCarrito(i)" class="text-red-400 hover:text-red-600"><i class="pi pi-trash"></i></button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Totales y Botón de Cobro -->
+      <div class="mt-6 pt-4 border-t border-gray-200">
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-gray-600 font-semibold">Total a Pagar:</span>
+          <span class="text-3xl font-bold text-verde-esmeralda">S/ {{ totalCarrito | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Si aún no se ha generado la orden -->
+        <button *ngIf="pasoActual === 1" 
+                (click)="generarOrden()" 
+                [disabled]="!pacienteActual || carrito.length === 0 || procesando"
+                class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors">
+          <span *ngIf="!procesando">Generar Orden (Paso 1)</span>
+          <span *ngIf="procesando"><i class="pi pi-spin pi-spinner mr-2"></i> Procesando...</span>
+        </button>
+
+        <!-- Sección de Pago (Aparece tras generar la orden) -->
+        <div *ngIf="pasoActual === 2" class="bg-gray-50 p-4 rounded-lg border border-gray-200 animate-fade-in">
+          <p class="text-sm text-gray-600 mb-2 font-semibold">Seleccione método de pago:</p>
+          <select [(ngModel)]="metodoPago" class="w-full px-3 py-2 border border-gray-300 rounded mb-4 focus:ring-blue-500 outline-none">
+            <option value="EFECTIVO">Efectivo</option>
+            <option value="TARJETA">Tarjeta (POS)</option>
+            <option value="YAPE">Yape / Plin</option>
+          </select>
+          
+          <button (click)="registrarPago()" [disabled]="procesando" class="w-full bg-verde-esmeralda text-white font-bold py-3 rounded hover:bg-green-600 transition-colors shadow-md">
+            <span *ngIf="!procesando">Confirmar Pago y Emitir Ticket</span>
+            <span *ngIf="procesando"><i class="pi pi-spin pi-spinner mr-2"></i> Registrando...</span>
+          </button>
+        </div>
+
+        <!-- Ticket Generado (Aparece al final) -->
+        <div *ngIf="pasoActual === 3" class="bg-green-50 border border-green-200 p-4 rounded-lg text-center animate-fade-in">
+          <i class="pi pi-check-circle text-green-500 text-4xl mb-2"></i>
+          <h3 class="font-bold text-gray-800">¡Pago Exitoso!</h3>
+          <p class="text-xs text-gray-600 mt-1">El paciente ya puede pasar a Tópico.</p>
+          <div class="mt-3 py-2 bg-white rounded border border-dashed border-gray-300">
+            <p class="text-xs text-gray-400 uppercase">Código de Ticket</p>
+            <p class="text-xl font-bold tracking-widest text-gray-800">{{ ordenGenerada?.codigoTicket }}</p>
+          </div>
+          <button (click)="reiniciarPuntoVenta()" class="mt-4 text-sm text-blue-600 font-semibold hover:underline">
+            Nueva Atención
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

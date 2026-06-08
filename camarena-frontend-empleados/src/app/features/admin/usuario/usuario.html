@@ -1,0 +1,52 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Gestión de Personal</h1>
+      <p class="text-gray-500 text-sm">Alta de usuarios, médicos y administrativos del sistema.</p>
+    </div>
+    <button (click)="mostrarModal = true" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded shadow font-semibold">
+      <i class="pi pi-user-plus mr-2"></i> Añadir Colaborador
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+    <p-table [value]="usuarios" [rows]="10" [paginator]="true" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nombre Completo</th>
+          <th>Correo / Usuario</th>
+          <th>Rol Asignado</th>
+          <th>Estado</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-u>
+        <tr>
+          <td class="font-bold text-gray-800">{{ u.nombre }}</td>
+          <td class="text-gray-600">{{ u.username }}</td>
+          <td>
+            <span class="px-2 py-1 rounded-full text-xs font-bold" 
+                  [ngClass]="{'bg-blue-100 text-blue-700': u.rol === 'RECEPCIONISTA', 'bg-emerald-100 text-emerald-700': u.rol === 'MEDICO'}">
+              {{ u.rol }}
+            </span>
+          </td>
+          <td><span class="text-green-600 font-bold">Activo</span></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Modal -->
+  <p-dialog header="Nuevo Colaborador" [(visible)]="mostrarModal" [style]="{ width: '400px' }">
+    <form [formGroup]="userForm" (ngSubmit)="guardar()" class="space-y-4 pt-4">
+      <input type="text" formControlName="nombre" placeholder="Nombre completo" class="w-full p-2 border rounded">
+      <input type="text" formControlName="username" placeholder="Usuario / Correo" class="w-full p-2 border rounded">
+      <input type="password" formControlName="password" placeholder="Contraseña" class="w-full p-2 border rounded">
+      <select formControlName="rol" class="w-full p-2 border rounded">
+        <option value="RECEPCIONISTA">Recepcionista</option>
+        <option value="MEDICO">Médico / Biólogo</option>
+        <option value="ADMIN">Administrador</option>
+      </select>
+      <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded font-bold">Registrar en BD</button>
+    </form>
+  </p-dialog>
+</div>

@@ -1,0 +1,107 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Tópico y Toma de Muestras</h1>
+    <p class="text-gray-500 text-sm">Controle el flujo de pacientes y genere etiquetas con código de barras.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
+    
+    <!-- COLUMNA 1: En Espera -->
+    <div class="bg-gray-100 rounded-lg p-4 flex flex-col border border-gray-200 shadow-inner">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-gray-700 uppercase text-sm tracking-wider">1. En Espera</h2>
+        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">{{ ordenesPendientes.length }}</span>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+        <!-- Tarjeta de Paciente -->
+        <div *ngFor="let orden of ordenesPendientes" class="bg-white p-4 rounded shadow-sm border-l-4 border-orange-400 hover:shadow-md transition-shadow">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="font-bold text-gray-800">{{ orden.nombrePaciente }}</p>
+              <p class="text-xs text-gray-500">Ticket: <span class="font-mono font-semibold">{{ orden.codigoTicket }}</span></p>
+            </div>
+          </div>
+          <button (click)="atenderPaciente(orden)" [disabled]="procesando" class="mt-3 w-full bg-blue-50 hover:bg-blue-100 disabled:opacity-50 text-blue-700 text-sm font-semibold py-2 rounded transition-colors">
+            Llamar y Generar Códigos
+          </button>
+        </div>
+
+        <div *ngIf="ordenesPendientes.length === 0" class="text-center text-gray-400 py-10 text-sm">
+          No hay pacientes en espera.
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA 2: En Proceso (Extracción) -->
+    <div class="bg-gray-100 rounded-lg p-4 flex flex-col border border-gray-200 shadow-inner">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-gray-700 uppercase text-sm tracking-wider">2. En Box de Extracción</h2>
+      </div>
+
+      <div class="flex-1 overflow-y-auto">
+        <div *ngIf="!pacienteEnAtencion" class="h-full flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 rounded-lg p-6">
+          <i class="pi pi-user text-4xl mb-2 text-gray-300"></i>
+          <p class="text-sm text-center">Seleccione un paciente de la lista "En Espera" para comenzar.</p>
+        </div>
+
+        <!-- Paciente Activo -->
+        <div *ngIf="pacienteEnAtencion" class="bg-white p-5 rounded shadow-sm border border-blue-200">
+          <div class="mb-4 pb-3 border-b border-gray-100">
+            <p class="text-xs text-blue-500 font-bold uppercase tracking-wider mb-1">Atendiendo a:</p>
+            <p class="font-bold text-gray-800 text-lg">{{ pacienteEnAtencion.nombrePaciente }}</p>
+          </div>
+
+          <h3 class="text-sm font-bold text-gray-700 mb-3">Muestras a recolectar:</h3>
+          
+          <ul class="space-y-3">
+            <li *ngFor="let muestra of muestrasGeneradas" class="flex items-center justify-between p-3 border border-gray-100 rounded bg-gray-50">
+              <div class="flex items-center">
+                <!-- Icono del Tubo (Color dinámico) -->
+                <i class="pi pi-filter text-xl mr-3" 
+                   [ngClass]="{
+                     'text-red-500': muestra.tipoTuboRequerido === 'ROJO',
+                     'text-purple-500': muestra.tipoTuboRequerido === 'LILA',
+                     'text-blue-400': muestra.tipoTuboRequerido === 'CELESTE'
+                   }"></i>
+                <div>
+                  <p class="font-semibold text-sm text-gray-800">{{ muestra.nombreExamen }}</p>
+                  <p class="text-xs text-gray-500 font-mono">{{ muestra.codigoBarras }}</p>
+                </div>
+              </div>
+              
+              <button *ngIf="muestra.estadoMuestra === 'PENDIENTE'" (click)="marcarTomada(muestra)" [disabled]="procesando" class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm">
+                Confirmar
+              </button>
+              <span *ngIf="muestra.estadoMuestra === 'TOMADA'" class="text-green-500 text-sm font-bold flex items-center">
+                <i class="pi pi-check-circle mr-1"></i> Lista
+              </span>
+            </li>
+          </ul>
+
+          <div class="mt-6 pt-4 border-t border-gray-100">
+            <button (click)="finalizarAtencion()" [disabled]="!todasMuestrasTomadas || procesando" class="w-full bg-verde-esmeralda hover:bg-green-600 disabled:bg-gray-300 disabled:text-gray-500 text-white font-bold py-2 rounded transition-colors">
+              Finalizar Paciente
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA 3: Completados -->
+    <div class="bg-gray-100 rounded-lg p-4 flex flex-col border border-gray-200 shadow-inner">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-gray-700 uppercase text-sm tracking-wider">3. Envíadas a Laboratorio</h2>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+        <div *ngFor="let completado of pacientesCompletados" class="bg-white p-3 rounded shadow-sm border-l-4 border-verde-esmeralda opacity-75">
+          <p class="font-semibold text-gray-800 text-sm">{{ completado.nombrePaciente }}</p>
+          <p class="text-xs text-green-600 mt-1"><i class="pi pi-check text-xs"></i> Muestras en Laboratorio</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<!-- Hatun kancha (Contenedor principal que ocupa toda la pantalla) -->
+<div class="flex h-screen w-full bg-gris-fondo overflow-hidden">
+
+  <!-- Sidebar Componente -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Paña law kancha (Área derecha que contiene el Topbar y el Contenido) -->
+  <div class="flex flex-col flex-1 overflow-hidden">
+    
+    <!-- Topbar Componente -->
+    <app-topbar></app-topbar>
+
+    <!-- Ukhu kancha (Área donde se cargan las pantallas con Lazy Loading) -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <!-- Kaypi wak componentekuna rikurimunqa -->
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>

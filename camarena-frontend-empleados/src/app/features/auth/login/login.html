@@ -1,0 +1,62 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      
+  <!-- Contenedor del Formulario -->
+  <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+    
+    <!-- Encabezado funcional -->
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-800">Laboratorio Camarena</h2>
+      <p class="text-sm text-gray-500 mt-2">Panel Administrativo</p>
+    </div>
+
+    <!-- Alerta de Error (Solo aparece si hay un error del servidor) -->
+    <div *ngIf="mensajeError" class="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center">
+      {{ mensajeError }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Campo Email -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+        <input 
+          type="email" 
+          formControlName="email"
+          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="admin@camarena.com"
+          [ngClass]="{'border-red-500': f['email'].invalid && f['email'].touched}"
+        >
+        <!-- Validación UX: Mensaje si está vacío o es inválido -->
+        <div *ngIf="f['email'].invalid && f['email'].touched" class="text-red-500 text-xs mt-1">
+          Ingrese un correo válido.
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+        <input 
+          type="password" 
+          formControlName="contrasena"
+          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="••••••••"
+          [ngClass]="{'border-red-500': f['contrasena'].invalid && f['contrasena'].touched}"
+        >
+         <div *ngIf="f['contrasena'].invalid && f['contrasena'].touched" class="text-red-500 text-xs mt-1">
+          La contraseña es obligatoria.
+        </div>
+      </div>
+
+      <!-- Botón de Envío (Maneja el estado de Carga) -->
+      <button 
+        type="submit" 
+        [disabled]="loginForm.invalid || cargando"
+        class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50 flex justify-center items-center transition-colors"
+      >
+        <span *ngIf="!cargando">Ingresar al Sistema</span>
+        <span *ngIf="cargando">Validando credenciales...</span>
+      </button>
+
+    </form>
+  </div>
+</div>

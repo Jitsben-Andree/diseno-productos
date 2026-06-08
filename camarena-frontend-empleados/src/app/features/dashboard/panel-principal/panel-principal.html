@@ -1,0 +1,80 @@
+<div class="p-6">
+  
+  <!-- Encabezado de la página -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Panel Principal</h1>
+    <p class="text-gray-500 text-sm mt-1">Resumen general de las operaciones de hoy</p>
+  </div>
+
+  <!-- Tarjetas de Indicadores (KPIs) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    
+    <!-- Tarjeta 1: Órdenes del día -->
+    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-blue-500">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Órdenes de Hoy</p>
+          <h3 class="text-3xl font-bold text-gray-800 mt-1">24</h3>
+        </div>
+        <div class="p-3 bg-blue-50 rounded-full">
+          <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+        </div>
+      </div>
+      <p class="text-green-500 text-xs mt-3 font-medium"><i class="pi pi-arrow-up text-xs mr-1"></i>+12% vs ayer</p>
+    </div>
+
+    <!-- Tarjeta 2: Ingresos -->
+    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-verde-esmeralda">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Ingresos del Día</p>
+          <h3 class="text-3xl font-bold text-gray-800 mt-1">S/ 1,450</h3>
+        </div>
+        <div class="p-3 bg-green-50 rounded-full">
+          <i class="pi pi-money-bill text-verde-esmeralda text-xl"></i>
+        </div>
+      </div>
+      <p class="text-gray-500 text-xs mt-3">Facturado en recepción</p>
+    </div>
+
+    <!-- Tarjeta 3: Muestras Pendientes -->
+    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-orange-400">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Muestras Pendientes</p>
+          <h3 class="text-3xl font-bold text-gray-800 mt-1">8</h3>
+        </div>
+        <div class="p-3 bg-orange-50 rounded-full">
+          <i class="pi pi-clock text-orange-400 text-xl"></i>
+        </div>
+      </div>
+      <p class="text-gray-500 text-xs mt-3">Esperando en tópico</p>
+    </div>
+
+    <!-- Tarjeta 4: Resultados Listos -->
+    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-purple-500">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Resultados Validados</p>
+          <h3 class="text-3xl font-bold text-gray-800 mt-1">15</h3>
+        </div>
+        <div class="p-3 bg-purple-50 rounded-full">
+          <i class="pi pi-check-circle text-purple-500 text-xl"></i>
+        </div>
+      </div>
+      <p class="text-gray-500 text-xs mt-3">Por biólogo de turno</p>
+    </div>
+
+    
+
+  </div>
+
+  <!-- Sección del Gráfico -->
+  <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Ingresos de los últimos 7 días</h2>
+    
+    <!-- Componente de PrimeNG Chart -->
+    <p-chart type="bar" [data]="datosGrafico" [options]="opcionesGrafico" height="300px"></p-chart>
+  </div>
+
+</div>

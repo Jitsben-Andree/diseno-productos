@@ -1,0 +1,132 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Catálogo Científico y Tarifario</h1>
+      <p class="text-gray-500 text-sm mt-1">Gestione los exámenes médicos, precios y tubos de laboratorio requeridos.</p>
+    </div>
+    <button 
+      (click)="abrirModalNuevo()"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition-colors flex items-center">
+      <i class="pi pi-plus mr-2"></i>
+      Nuevo Examen
+    </button>
+  </div>
+
+  <!-- Tabla de Exámenes -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+    <p-table 
+      [value]="examenes" 
+      [paginator]="true" 
+      [rows]="10" 
+      [loading]="cargando"
+      styleClass="p-datatable-sm p-datatable-striped"
+      [tableStyle]="{ 'min-width': '50rem' }">
+      
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-left text-gray-600 font-semibold p-3 w-32">Código</th>
+          <th class="text-left text-gray-600 font-semibold p-3">Descripción del Examen</th>
+          <th class="text-center text-gray-600 font-semibold p-3">Tubo Requerido</th>
+          <th class="text-right text-gray-600 font-semibold p-3">Precio Base</th>
+          <th class="text-center text-gray-600 font-semibold p-3">Inteligencia Clínica</th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-examen>
+        <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+          <td class="p-3 text-blue-600 font-mono font-bold text-sm">{{ examen.codigo }}</td>
+          <td class="p-3 text-gray-800 font-medium">{{ examen.descripcion }}</td>
+          <td class="p-3 text-center">
+            <span class="px-2 py-1 rounded text-xs font-bold border"
+                  [ngClass]="{
+                    'bg-purple-50 text-purple-700 border-purple-200': examen.tipoTuboDefecto === 'LILA',
+                    'bg-red-50 text-red-700 border-red-200': examen.tipoTuboDefecto === 'ROJO',
+                    'bg-yellow-50 text-yellow-700 border-yellow-200': examen.tipoTuboDefecto === 'AMARILLO',
+                    'bg-blue-50 text-blue-700 border-blue-200': examen.tipoTuboDefecto === 'CELESTE'
+                  }">
+              {{ examen.tipoTuboDefecto }}
+            </span>
+          </td>
+          <td class="p-3 text-right font-bold text-verde-esmeralda">S/ {{ examen.precioBase | number:'1.2-2' }}</td>
+          <td class="p-3 text-center">
+            <button (click)="abrirModalParametro(examen)" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded transition-colors">
+              <i class="pi pi-sliders-h mr-1"></i> Parámetros
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="5" class="text-center p-8 text-gray-500">
+          <i class="pi pi-folder-open text-4xl mb-3 text-gray-300 block"></i>
+          El catálogo está vacío. Comience agregando un nuevo examen.
+        </td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Modal: Crear Nuevo Examen -->
+  <p-dialog header="Registrar Nuevo Examen" [(visible)]="mostrarModalExamen" [modal]="true" [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
+    <form [formGroup]="examenForm" (ngSubmit)="guardarExamen()" class="mt-4">
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Código Único</label>
+        <input type="text" formControlName="codigo" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none font-mono uppercase" placeholder="Ej. HEM-001">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del Examen</label>
+        <input type="text" formControlName="descripcion" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none" placeholder="Ej. Hemograma Completo">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tubo a utilizar</label>
+          <select formControlName="tipoTuboDefecto" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none bg-white">
+            <option value="">Seleccione...</option>
+            <option value="LILA">Tubo Lila (EDTA)</option>
+            <option value="ROJO">Tubo Rojo (Suero)</option>
+            <option value="AMARILLO">Tubo Amarillo (Gel)</option>
+            <option value="CELESTE">Tubo Celeste (Citrato)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Precio (S/)</label>
+          <input type="number" formControlName="precioBase" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none font-bold text-verde-esmeralda">
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+        <button type="button" (click)="mostrarModalExamen = false" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded font-medium transition-colors">Cancelar</button>
+        <button type="submit" [disabled]="examenForm.invalid || guardando" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium disabled:opacity-50 transition-colors">
+          <span *ngIf="!guardando">Guardar Examen</span><span *ngIf="guardando">Guardando...</span>
+        </button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Modal: Agregar Parámetro -->
+  <p-dialog header="Agregar Parámetro Clínico" [(visible)]="mostrarModalParametro" [modal]="true" [style]="{ width: '400px' }" [draggable]="false" [resizable]="false">
+    <div class="mb-4 p-3 bg-blue-50 rounded border border-blue-100 text-sm">
+      Agregando a: <span class="font-bold text-blue-800">{{ examenSeleccionado?.descripcion }}</span>
+    </div>
+    
+    <form [formGroup]="parametroForm" (ngSubmit)="guardarParametro()">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Parámetro</label>
+        <input type="text" formControlName="nombre" class="w-full px-3 py-2 border border-gray-300 rounded outline-none" placeholder="Ej. Glucosa Basal">
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Unidad de Medida</label>
+        <input type="text" formControlName="unidad" class="w-full px-3 py-2 border border-gray-300 rounded outline-none" placeholder="Ej. mg/dL">
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="submit" [disabled]="parametroForm.invalid || guardando" class="w-full py-2 bg-blue-600 text-white rounded font-medium">
+          Agregar Parámetro
+        </button>
+      </div>
+    </form>
+  </p-dialog>
+
+</div>

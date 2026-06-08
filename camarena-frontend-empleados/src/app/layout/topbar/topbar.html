@@ -1,0 +1,25 @@
+<!-- Hanan wamp'una (Barra superior de navegación) -->
+<header class="bg-white h-16 shadow-sm border-b border-gray-200 flex items-center justify-between px-6 z-10">
+  
+  <!-- Lluq'i law (Lado izquierdo vacío o con migas de pan) -->
+  <div>
+    <h1 class="text-xl font-semibold text-gray-800">Ruwaykuna (Panel de Control)</h1>
+  </div>
+
+  <!-- Paña law (Perfil y Cerrar Sesión) -->
+  <div class="flex items-center space-x-4">
+    
+    <!-- Ruraqpa sutin (Nombre del Usuario) -->
+    <div class="flex items-center space-x-2 text-sm text-gray-600 border-r border-gray-300 pr-4">
+      <i class="pi pi-user p-2 bg-gray-100 rounded-full"></i>
+      <span class="font-medium">Kamachiq (Admin)</span>
+    </div>
+
+    <!-- Lluqsiy ñit'ina (Botón de Cerrar Sesión) -->
+    <button (click)="lluqsiy()" class="text-gray-500 hover:text-red-600 transition-colors flex items-center px-2 py-1 rounded">
+      <i class="pi pi-power-off mr-2"></i>
+      Lluqsiy (Salir)
+    </button>
+  </div>
+
+</header>
