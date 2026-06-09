@@ -28,6 +28,9 @@ export class CatalogoComponent implements OnInit {
   examenSeleccionado: any = null;
   parametroForm: FormGroup;
 
+  // Sistema de Notificaciones Flotante
+  notificacion: any = null;
+
   constructor() {
     this.examenForm = this.fb.group({
       codigo: ['', Validators.required],
@@ -38,12 +41,23 @@ export class CatalogoComponent implements OnInit {
 
     this.parametroForm = this.fb.group({
       nombre: ['', Validators.required],
-      unidad: ['']
+      unidad: [''],
+      valorMin: [0, Validators.required],
+      valorMax: [0, Validators.required],
+      sexoAplica: ['A', Validators.required] // 'A' = Ambos sexos
     });
   }
 
   ngOnInit() {
     this.cargarCatalogo();
+  }
+
+  // Método unificado para alertas elegantes sin bloquear la UI
+  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' | 'advertencia' = 'exito') {
+    this.notificacion = { mensaje, tipo };
+    setTimeout(() => {
+      this.notificacion = null;
+    }, 4000);
   }
 
   cargarCatalogo() {
@@ -55,6 +69,7 @@ export class CatalogoComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar catálogo', err);
+        this.mostrarNotificacion("Error al conectar con el catálogo de exámenes.", "error");
         this.examenes = [];
         this.cargando = false;
       }
@@ -76,20 +91,24 @@ export class CatalogoComponent implements OnInit {
       next: (res) => {
         this.mostrarModalExamen = false;
         this.guardando = false;
-        this.cargarCatalogo(); // Recargamos para ver el nuevo examen
+        this.cargarCatalogo(); 
+        this.mostrarNotificacion(`Examen ${request.codigo} creado con éxito.`, "exito");
       },
       error: (err) => {
         console.error('Error al crear', err);
-        alert('Ocurrió un error al guardar. Verifique que el código no esté duplicado.');
+        this.mostrarNotificacion("Ocurrió un error. Verifique que el código no esté duplicado.", "error");
         this.guardando = false;
       }
     });
   }
 
-  // Lógica para Parámetros
   abrirModalParametro(examen: any) {
     this.examenSeleccionado = examen;
-    this.parametroForm.reset();
+    this.parametroForm.reset({
+      valorMin: 0,
+      valorMax: 0,
+      sexoAplica: 'A'
+    });
     this.mostrarModalParametro = true;
   }
 
@@ -99,12 +118,13 @@ export class CatalogoComponent implements OnInit {
     this.guardando = true;
     this.catalogoService.agregarParametro(this.examenSeleccionado.idExamen, this.parametroForm.value).subscribe({
       next: () => {
-        alert('Parámetro agregado exitosamente a la base de datos.');
         this.mostrarModalParametro = false;
         this.guardando = false;
+        this.mostrarNotificacion("Parámetro biológico agregado correctamente.", "exito");
       },
       error: (err) => {
-        alert('Error al agregar el parámetro.');
+        console.error('Error al guardar parámetro', err);
+        this.mostrarNotificacion("Error de servidor al guardar el parámetro.", "error");
         this.guardando = false;
       }
     });

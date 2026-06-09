@@ -1,121 +1,189 @@
-<div class="p-6 bg-gray-50 min-h-screen">
+<div class="p-2 md:p-4 animate-fadeIn text-gray-300 relative">
   
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Validación Clínica y Resultados</h1>
-    <p class="text-gray-500 text-sm">Ingrese los valores analíticos, valide rangos y emita los informes.</p>
+  <!-- Sistema de Notificaciones Flotante Premium -->
+  <div *ngIf="notificacion" 
+       class="fixed top-24 right-8 z-50 px-6 py-4 rounded-xl backdrop-blur-md border shadow-2xl animate-fadeIn flex items-center gap-3"
+       [ngClass]="{
+         'bg-emerald-500/10 border-emerald-500/20 text-emerald-400': notificacion.tipo === 'exito',
+         'bg-red-500/10 border-red-500/20 text-red-400': notificacion.tipo === 'error',
+         'bg-amber-500/10 border-amber-500/20 text-amber-400': notificacion.tipo === 'advertencia'
+       }">
+    <i class="pi text-xl" 
+       [ngClass]="{
+         'pi-check-circle': notificacion.tipo === 'exito',
+         'pi-exclamation-circle': notificacion.tipo === 'error',
+         'pi-exclamation-triangle': notificacion.tipo === 'advertencia'
+       }"></i>
+    <span class="font-medium text-sm">{{ notificacion.mensaje }}</span>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
+  <div class="mb-8">
+    <h1 class="text-3xl font-extrabold text-white tracking-tight">Consola de Validación Clínica</h1>
+    <p class="text-gray-400 text-sm mt-1">Ingrese parámetros analíticos, identifique anomalías y emita informes PDF firmados.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[calc(100vh-210px)] min-h-[500px]">
     
     <!-- COLUMNA IZQUIERDA: Tubos/Muestras Pendientes -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full overflow-hidden">
-      <div class="bg-blue-600 p-4">
+    <div class="bg-[#0a0a0c]/60 border border-white/10 rounded-3xl backdrop-blur-xl flex flex-col h-full overflow-hidden shadow-2xl relative">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 opacity-[0.03] blur-[40px] pointer-events-none"></div>
+
+      <div class="bg-[#070708]/80 p-5 border-b border-white/5 relative z-10">
         <h2 class="font-bold text-white uppercase text-sm tracking-wider flex items-center">
-          <i class="pi pi-inbox mr-2 text-lg"></i> Bandeja de Entrada
+          <i class="pi pi-inbox mr-3 text-blue-500"></i> Bandeja de Entrada
         </h2>
       </div>
       
       <!-- Buscador por Código de Barras -->
-      <div class="p-3 border-b border-gray-100 bg-gray-50">
+      <div class="p-4 border-b border-white/5 bg-[#0a0a0c]">
         <div class="relative">
-          <i class="pi pi-barcode absolute left-3 top-3 text-gray-400"></i>
-          <input type="text" placeholder="Escanear código (Ej. BAR-123)" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none text-sm font-mono uppercase">
+          <i class="pi pi-barcode absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+          <input type="text" placeholder="Escanear (Ej. BAR-123)" 
+                 class="w-full pl-11 pr-4 py-3 bg-[#070708] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#f05435]/50 outline-none text-sm font-mono uppercase text-white placeholder-gray-600 transition-all">
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-2 space-y-2">
+      <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+        <!-- Tarjeta de Muestra -->
         <div *ngFor="let tubo of tubosPendientes" 
              (click)="seleccionarTubo(tubo)"
-             class="p-3 rounded border cursor-pointer transition-all duration-200"
-             [ngClass]="tuboSeleccionado?.idMuestra === tubo.idMuestra ? 'bg-blue-50 border-blue-400 shadow-sm' : 'bg-white border-gray-200 hover:border-blue-300 hover:bg-gray-50'">
+             class="p-4 rounded-2xl border cursor-pointer transition-all duration-200 group relative overflow-hidden"
+             [ngClass]="tuboSeleccionado?.idMuestra === tubo.idMuestra ? 'bg-[#f05435]/10 border-[#f05435]/30 shadow-[0_0_15px_rgba(240,84,53,0.1)]' : 'bg-[#070708]/40 border-white/5 hover:border-white/20 hover:bg-white/[0.02]'">
           
-          <div class="flex justify-between items-start mb-1">
-            <span class="font-mono text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">{{ tubo.codigoBarras }}</span>
-            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded" 
-                  [ngClass]="tubo.prioridad === 'URGENTE' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'">
+          <div class="absolute right-0 top-0 w-16 h-full bg-gradient-to-l from-[#f05435]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+          <div class="flex justify-between items-start mb-3">
+            <span class="font-mono text-[11px] font-bold tracking-widest px-2.5 py-1 rounded"
+                  [ngClass]="tuboSeleccionado?.idMuestra === tubo.idMuestra ? 'bg-[#f05435]/20 text-[#f05435]' : 'bg-white/5 text-gray-400'">
+              {{ tubo.codigoBarras }}
+            </span>
+            <span class="text-[9px] uppercase font-black px-2 py-1 rounded-full tracking-widest border" 
+                  [ngClass]="tubo.prioridad === 'URGENTE' ? 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_8px_rgba(239,68,68,0.2)]' : 'bg-white/5 text-gray-500 border-white/5'">
               {{ tubo.prioridad }}
             </span>
           </div>
-          <p class="font-bold text-gray-800 text-sm mt-2">{{ tubo.nombreExamen }}</p>
-          <p class="text-xs text-gray-500 mt-1"><i class="pi pi-user mr-1"></i>{{ tubo.paciente }}</p>
+          <p class="font-bold text-white text-sm" [ngClass]="tuboSeleccionado?.idMuestra === tubo.idMuestra ? 'text-[#f05435]' : ''">{{ tubo.nombreExamen }}</p>
+          <p class="text-xs text-gray-500 mt-1.5 flex items-center gap-1.5"><i class="pi pi-user text-[10px]"></i> {{ tubo.paciente }}</p>
         </div>
 
-        <div *ngIf="tubosPendientes.length === 0" class="text-center text-gray-400 py-10 text-sm">
-          No hay muestras pendientes de análisis.
+        <!-- Estado Vacío -->
+        <div *ngIf="tubosPendientes.length === 0" class="h-full flex flex-col items-center justify-center text-gray-600 py-12">
+          <i class="pi pi-check-circle text-3xl mb-3 opacity-50"></i>
+          <p class="text-xs font-medium text-center">Bandeja limpia.<br>No hay muestras pendientes de análisis.</p>
         </div>
       </div>
     </div>
 
     <!-- COLUMNA DERECHA: Ingreso de Datos Científicos -->
-    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
+    <div class="lg:col-span-2 bg-[#0a0a0c]/60 border border-white/10 rounded-3xl backdrop-blur-xl flex flex-col h-full shadow-2xl relative overflow-hidden">
       
+      <!-- Llama de fondo decorativa -->
+      <div class="absolute bottom-[-10%] right-[-5%] w-64 h-64 bg-[#f05435] opacity-[0.02] blur-[60px] pointer-events-none"></div>
+
       <!-- Estado Vacío -->
-      <div *ngIf="!tuboSeleccionado" class="flex-1 flex flex-col items-center justify-center text-gray-400 p-10 text-center">
-        <i class="pi pi-microchip text-6xl mb-4 text-gray-200"></i>
-        <h3 class="text-lg font-bold text-gray-600">Seleccione una muestra</h3>
-        <p class="text-sm mt-1">Haga clic en un tubo de la bandeja izquierda para comenzar a ingresar sus valores analíticos.</p>
+      <div *ngIf="!tuboSeleccionado" class="flex-1 flex flex-col items-center justify-center text-gray-500 p-10 text-center bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')]">
+        <div class="w-20 h-20 rounded-3xl bg-[#070708] border border-white/5 shadow-inner flex items-center justify-center mb-6">
+          <i class="pi pi-microchip text-4xl text-gray-600"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white tracking-wide">Terminal en Espera</h3>
+        <p class="text-xs mt-2 text-gray-500 max-w-sm leading-relaxed">Seleccione un tubo de ensayo de la bandeja lateral para iniciar la transcripción de parámetros clínicos.</p>
       </div>
 
       <!-- Formulario de Resultados -->
-      <div *ngIf="tuboSeleccionado" class="flex flex-col h-full">
+      <div *ngIf="tuboSeleccionado" class="flex flex-col h-full relative z-10 animate-fadeIn">
         
-        <!-- Cabecera del Paciente -->
-        <div class="p-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+        <!-- Cabecera del Paciente Activo -->
+        <div class="p-6 border-b border-white/5 bg-[#070708]/50 flex justify-between items-center">
           <div>
-            <h2 class="text-xl font-bold text-gray-800">{{ tuboSeleccionado.nombreExamen }}</h2>
-            <p class="text-sm text-gray-600 mt-1">Paciente: <span class="font-semibold">{{ tuboSeleccionado.paciente }}</span> | Orden: {{ tuboSeleccionado.idOrdenCorto }}</p>
+            <h2 class="text-2xl font-black text-white flex items-center gap-3">
+              {{ tuboSeleccionado.nombreExamen }}
+              <span class="bg-[#f05435]/10 text-[#f05435] text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border border-[#f05435]/20">Procesando</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-2 flex items-center gap-3">
+              <span><i class="pi pi-user mr-1 text-[#f05435]"></i> <span class="font-bold text-gray-300">{{ tuboSeleccionado.paciente }}</span></span>
+              <span class="text-white/20">|</span>
+              <span>Orden: <span class="font-mono text-gray-300">{{ tuboSeleccionado.idOrdenCorto }}</span></span>
+            </p>
           </div>
-          <div class="text-right">
-            <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Cód. Barras</p>
-            <p class="font-mono text-lg font-bold text-gray-800">{{ tuboSeleccionado.codigoBarras }}</p>
+          <div class="text-right bg-[#0a0a0c] p-3 rounded-xl border border-white/5 shadow-inner">
+            <p class="text-[9px] text-gray-500 uppercase font-black tracking-widest mb-1">Cód. Identificador</p>
+            <p class="font-mono text-lg font-bold text-[#f05435]">{{ tuboSeleccionado.codigoBarras }}</p>
           </div>
         </div>
 
-        <!-- Tabla de Parámetros -->
-        <div class="flex-1 overflow-y-auto p-6">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b-2 border-gray-200">
-                <th class="pb-3 font-semibold text-gray-600 w-1/3">Parámetro Analizado</th>
-                <th class="pb-3 font-semibold text-gray-600 w-1/3">Valor Obtenido</th>
-                <th class="pb-3 font-semibold text-gray-600 w-1/3">Rango de Referencia</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let param of parametrosClinicos" class="border-b border-gray-100 hover:bg-gray-50">
-                <td class="py-4 font-medium text-gray-800">{{ param.nombre }}</td>
-                <td class="py-4">
-                  <div class="flex items-center space-x-2">
-                    <input type="number" [(ngModel)]="param.valorObtenido" 
-                           class="w-24 px-3 py-1.5 border border-gray-300 rounded focus:ring-blue-500 outline-none text-right font-medium"
-                           [ngClass]="{'border-red-400 text-red-600 bg-red-50': param.valorObtenido && (param.valorObtenido < param.rangoMin || param.valorObtenido > param.rangoMax)}">
-                    <span class="text-sm text-gray-500">{{ param.unidad }}</span>
-                    
-                    <!-- Alerta visual de anormalidad en vivo -->
-                    <i *ngIf="param.valorObtenido && (param.valorObtenido < param.rangoMin || param.valorObtenido > param.rangoMax)" 
-                       class="pi pi-exclamation-triangle text-red-500 ml-2" title="Valor fuera de rango"></i>
-                  </div>
-                </td>
-                <td class="py-4 text-sm text-gray-500 font-mono">
-                  {{ param.rangoMin }} - {{ param.rangoMax }} {{ param.unidad }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Tabla Científica de Parámetros -->
+        <div class="flex-1 overflow-y-auto p-2 custom-scrollbar">
+          <div class="bg-[#070708]/30 rounded-2xl border border-white/5 overflow-hidden m-4">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-[#0a0a0c] border-b border-white/10 text-xs uppercase tracking-widest font-black text-gray-500">
+                  <th class="p-4 w-1/3">Parámetro Biológico</th>
+                  <th class="p-4 w-1/3">Valor Registrado</th>
+                  <th class="p-4 w-1/3 text-right">Rango Referencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Iteración de Parámetros -->
+                <tr *ngFor="let param of parametrosClinicos" class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  
+                  <td class="p-4 font-bold text-gray-300">{{ param.nombre }}</td>
+                  
+                  <td class="p-4">
+                    <div class="flex items-center space-x-3">
+                      <!-- Input Numérico con Lógica de Alerta Visual -->
+                      <input type="number" 
+                             [(ngModel)]="param.valorObtenido" 
+                             class="w-28 px-4 py-2.5 bg-[#070708] border rounded-xl outline-none text-right font-mono font-bold transition-all"
+                             [ngClass]="{
+                               'border-white/10 text-white focus:border-[#f05435] focus:ring-1 focus:ring-[#f05435]/50': !param.valorObtenido || (param.valorObtenido >= param.rangoMin && param.valorObtenido <= param.rangoMax),
+                               'border-red-500/50 bg-red-500/10 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.15)]': param.valorObtenido && (param.valorObtenido < param.rangoMin || param.valorObtenido > param.rangoMax)
+                             }">
+                      
+                      <span class="text-xs text-gray-500 font-bold w-8">{{ param.unidad }}</span>
+                      
+                      <!-- Ícono Neón de Anomalía (Solo aparece si está fuera de rango) -->
+                      <div class="w-6">
+                        <i *ngIf="param.valorObtenido && (param.valorObtenido < param.rangoMin || param.valorObtenido > param.rangoMax)" 
+                           class="pi pi-exclamation-triangle text-red-500 text-lg drop-shadow-[0_0_5px_rgba(239,68,68,0.5)] animate-pulse" 
+                           title="Anomalía Detectada: Valor fuera del rango normal"></i>
+                      </div>
+                    </div>
+                  </td>
+                  
+                  <td class="p-4 text-xs text-gray-500 font-mono text-right">
+                    <span class="bg-white/5 px-2 py-1 rounded">{{ param.rangoMin }} - {{ param.rangoMax }}</span> {{ param.unidad }}
+                  </td>
+                </tr>
+                
+                <tr *ngIf="parametrosClinicos.length === 0" class="text-center">
+                  <td colspan="3" class="p-8 text-gray-500 text-xs">
+                    <i class="pi pi-spin pi-spinner text-lg mb-2"></i><br>Cargando plantilla del examen...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <!-- Botonera Inferior -->
-        <div class="p-5 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
-          <p class="text-sm text-gray-500">
-            <i class="pi pi-info-circle mr-1"></i> Asegúrese de revisar los valores en <span class="text-red-500 font-bold">rojo</span>.
-          </p>
-          <div class="space-x-3">
-            <button (click)="tuboSeleccionado = null" class="px-5 py-2 text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 rounded font-semibold transition-colors">
-              Cancelar
+        <!-- Botonera de Firma (Footer) -->
+        <div class="p-6 border-t border-white/5 bg-[#0a0a0c]/80 flex justify-between items-center backdrop-blur-md">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+              <i class="pi pi-verified"></i>
+            </div>
+            <p class="text-xs text-gray-400 max-w-xs leading-relaxed">
+              Verifique los valores en <span class="text-red-400 font-bold bg-red-500/10 px-1 rounded">rojo</span>. La aprobación aplicará su firma digital al documento final.
+            </p>
+          </div>
+          
+          <div class="flex gap-3">
+            <button (click)="tuboSeleccionado = null" class="px-6 py-3 text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white rounded-xl font-bold transition-all text-sm border border-white/5 active:scale-95">
+              Descartar
             </button>
-            <button (click)="aprobarResultados()" [disabled]="procesando" class="px-5 py-2 bg-verde-esmeralda hover:bg-green-600 text-white rounded font-bold transition-colors shadow-sm disabled:opacity-50 flex items-center">
-              <span *ngIf="!procesando"><i class="pi pi-check-circle mr-2"></i>Aprobar y Generar PDF</span>
-              <span *ngIf="procesando"><i class="pi pi-spin pi-spinner mr-2"></i>Firmando documento...</span>
+            <button (click)="aprobarResultados()" [disabled]="procesando || parametrosClinicos.length === 0" 
+                    class="px-8 py-3 bg-[#f05435] hover:bg-[#d94426] text-white rounded-xl font-black transition-all shadow-lg shadow-orange-950/40 disabled:opacity-30 disabled:cursor-not-allowed flex items-center text-sm active:scale-95">
+              <span *ngIf="!procesando"><i class="pi pi-file-pdf mr-2"></i>Aprobar y Emitir PDF</span>
+              <span *ngIf="procesando"><i class="pi pi-spin pi-spinner mr-2"></i>Firmando Docs...</span>
             </button>
           </div>
         </div>

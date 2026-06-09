@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChartModule } from 'primeng/chart'; // <-- Importamos el componente de gráficos
+import { ChartModule } from 'primeng/chart'; 
 
 @Component({
   selector: 'app-panel-principal',
   standalone: true,
-  imports: [CommonModule, ChartModule], // <-- Lo agregamos a los imports
+  imports: [CommonModule, ChartModule], 
   templateUrl: './panel-principal.html'
 })
 export class PanelPrincipalComponent implements OnInit {
@@ -25,33 +25,38 @@ export class PanelPrincipalComponent implements OnInit {
       datasets: [
         {
           label: 'Ingresos (S/)',
-          backgroundColor: '#0f4c81', // Nuestro azul-clinico
-          borderColor: '#0f4c81',
+          // Actualizado al naranja corporativo del login
+          backgroundColor: '#f05435', 
+          borderColor: '#f05435',
           data: [850, 1200, 950, 1400, 1800, 2100, 600],
-          borderRadius: 4 // Bordes redondeados en las barras
+          // Bordes redondeados más pronunciados para encajar con el diseño
+          borderRadius: 6 
         }
       ]
     };
 
-    // 2. Opciones de diseño del gráfico
+    // 2. Opciones de diseño del gráfico adaptadas a fondo oscuro
     this.opcionesGrafico = {
       maintainAspectRatio: false,
       aspectRatio: 0.8,
       plugins: {
         legend: {
           labels: {
-            color: '#4b5563' // Color del texto de la leyenda (gris)
+            color: '#9ca3af' // Gris claro (text-gray-400) para fondo oscuro
           }
         }
       },
       scales: {
         x: {
-          ticks: { color: '#6b7280' },
-          grid: { display: false } // Ocultar líneas verticales de la cuadrícula
+          ticks: { color: '#9ca3af' }, // Textos del eje X en gris claro
+          grid: { display: false } 
         },
         y: {
-          ticks: { color: '#6b7280' },
-          grid: { color: '#e5e7eb' } // Líneas horizontales gris muy claro
+          ticks: { color: '#9ca3af' }, // Textos del eje Y en gris claro
+          grid: { 
+            color: 'rgba(255, 255, 255, 0.05)', // Líneas divisorias tenues translúcidas
+            drawBorder: false
+          } 
         }
       }
     };

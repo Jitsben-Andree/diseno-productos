@@ -19,18 +19,29 @@ export class ValidacionClinicaComponent implements OnInit {
   parametrosClinicos: any[] = [];
   procesando = false;
 
+  // Sistema de Notificaciones Flotante
+  notificacion: any = null;
+
   ngOnInit() {
     this.cargarBandejaEntrada();
   }
 
+  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' | 'advertencia' = 'exito') {
+    this.notificacion = { mensaje, tipo };
+    setTimeout(() => {
+      this.notificacion = null;
+    }, 4500); // Se esconde tras 4.5 segundos
+  }
+
   cargarBandejaEntrada() {
-    // Petición REAL al backend (Spring Boot) para traer los tubos pendientes
+    // Petición al backend (Spring Boot) para traer los tubos pendientes
     this.resultadosService.obtenerParametrosPendientes().subscribe({
       next: (data) => {
         this.tubosPendientes = data;
       },
       error: (err) => {
         console.error('Error al cargar la bandeja de entrada:', err);
+        this.mostrarNotificacion("Error al conectar con la bandeja de muestras del servidor.", "error");
         this.tubosPendientes = [];
       }
     });
@@ -38,9 +49,8 @@ export class ValidacionClinicaComponent implements OnInit {
 
   seleccionarTubo(tubo: any) {
     this.tuboSeleccionado = tubo;
+    this.parametrosClinicos = []; // Limpiamos la tabla anterior mientras carga
     
-    // Petición REAL al backend para traer los parámetros de ESE examen
-    // Asumimos que el tubo tiene la propiedad idDetalleOrden enviada desde Spring Boot
     const idDetalle = tubo.idDetalleOrden || tubo.idMuestra; 
     
     this.resultadosService.obtenerResultadosDeExamen(idDetalle).subscribe({
@@ -49,16 +59,16 @@ export class ValidacionClinicaComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar los parámetros clínicos:', err);
-        this.parametrosClinicos = [];
+        this.mostrarNotificacion("No se pudieron extraer los parámetros de este examen.", "error");
       }
     });
   }
 
   aprobarResultados() {
     // 1. Validar que no haya campos vacíos
-    const faltanDatos = this.parametrosClinicos.some(p => p.valorObtenido === null || p.valorObtenido === undefined);
+    const faltanDatos = this.parametrosClinicos.some(p => p.valorObtenido === null || p.valorObtenido === undefined || p.valorObtenido === '');
     if (faltanDatos) {
-      alert("Por favor, ingrese todos los valores antes de aprobar el examen.");
+      this.mostrarNotificacion("Operación denegada: Ingrese todos los valores antes de firmar el examen.", "advertencia");
       return;
     }
 
@@ -82,26 +92,26 @@ export class ValidacionClinicaComponent implements OnInit {
         
         this.resultadosService.aprobarYGenerarPdf(idOrden).subscribe({
           next: (res) => {
-            // Quitamos el tubo de la bandeja porque ya fue procesado
+            // Quitamos el tubo de la bandeja
             this.tubosPendientes = this.tubosPendientes.filter(t => t.idMuestra !== this.tuboSeleccionado.idMuestra);
+            
+            this.mostrarNotificacion("Resultados firmados exitosamente. PDF generado en la nube.", "exito");
             
             // Limpiamos la pantalla derecha
             this.tuboSeleccionado = null;
             this.parametrosClinicos = [];
             this.procesando = false;
-            
-            alert("¡Resultados aprobados exitosamente! El PDF ha sido generado y el paciente ha sido notificado.");
           },
           error: (err) => {
             console.error("Error al aprobar la orden", err);
-            alert("Los valores se guardaron, pero hubo un error al generar el PDF.");
+            this.mostrarNotificacion("Valores guardados, pero el motor PDF no respondió.", "advertencia");
             this.procesando = false;
           }
         });
       },
       error: (err) => {
         console.error("Error al guardar valores individuales", err);
-        alert("Ocurrió un error al guardar los resultados en la base de datos.");
+        this.mostrarNotificacion("Error crítico al intentar guardar los resultados en la base de datos.", "error");
         this.procesando = false;
       }
     });

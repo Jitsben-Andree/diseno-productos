@@ -1,12 +1,43 @@
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss',
+  templateUrl: './sidebar.html'
 })
-export class SidebarComponent {}
+export class SidebarComponent implements OnInit {
+  private router = inject(Router);
+
+  correoActual: string = 'Usuario';
+  rolActual: string = '';
+
+  ngOnInit() {
+    this.decodificarToken();
+    this.rolActual = localStorage.getItem('rol_camarena') || ''; 
+  }
+
+  decodificarToken() {
+    const token = localStorage.getItem('jwt_camarena');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.correoActual = payload.sub || payload.email || 'Usuario';
+      } catch (e) {
+        console.error('Error al decodificar token', e);
+      }
+    }
+  }
+
+  get isAdmin(): boolean { return this.rolActual.includes('ROLE_ADMIN'); }
+  get isRecepcion(): boolean { return this.rolActual.includes('ROLE_RECEPCION') || this.isAdmin; }
+  get isBiologo(): boolean { return this.rolActual.includes('ROLE_BIOLOGO') || this.isAdmin; }
+
+  cerrarSesion() {
+    localStorage.removeItem('jwt_camarena'); 
+    localStorage.removeItem('rol_camarena'); 
+    this.router.navigate(['/login']);        
+  }
+}

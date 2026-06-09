@@ -1,80 +1,99 @@
-<div class="p-6">
+<div class="p-2 md:p-4 animate-fadeIn">
   
   <!-- Encabezado de la página -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Panel Principal</h1>
-    <p class="text-gray-500 text-sm mt-1">Resumen general de las operaciones de hoy</p>
+  <div class="mb-8">
+    <h1 class="text-3xl font-extrabold text-white tracking-tight">Panel Principal</h1>
+    <p class="text-gray-400 text-sm mt-1">Resumen general de las operaciones de hoy</p>
   </div>
 
-  <!-- Tarjetas de Indicadores (KPIs) -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <!-- Tarjetas de Indicadores (KPIs) con Glassmorphism -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
     
     <!-- Tarjeta 1: Órdenes del día -->
-    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-blue-500">
-      <div class="flex justify-between items-center">
+    <div class="bg-[#0a0a0c]/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden group hover:bg-white/5 transition-all duration-300">
+      <!-- Acento de borde luminoso -->
+      <div class="absolute top-0 left-0 w-1 h-full bg-[#f05435] shadow-[0_0_15px_#f05435]"></div>
+      
+      <div class="flex justify-between items-center relative z-10">
         <div>
-          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Órdenes de Hoy</p>
-          <h3 class="text-3xl font-bold text-gray-800 mt-1">24</h3>
+          <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">Órdenes de Hoy</p>
+          <h3 class="text-3xl font-extrabold text-white">24</h3>
         </div>
-        <div class="p-3 bg-blue-50 rounded-full">
-          <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+        <div class="w-12 h-12 rounded-xl bg-[#f05435]/10 border border-[#f05435]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <i class="pi pi-shopping-cart text-[#f05435] text-xl drop-shadow-[0_0_8px_rgba(240,84,53,0.8)]"></i>
         </div>
       </div>
-      <p class="text-green-500 text-xs mt-3 font-medium"><i class="pi pi-arrow-up text-xs mr-1"></i>+12% vs ayer</p>
+      <p class="text-green-400 text-xs mt-4 font-medium flex items-center relative z-10">
+        <i class="pi pi-arrow-up text-[10px] mr-1"></i>+12% vs ayer
+      </p>
     </div>
 
     <!-- Tarjeta 2: Ingresos -->
-    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-verde-esmeralda">
-      <div class="flex justify-between items-center">
+    <div class="bg-[#0a0a0c]/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden group hover:bg-white/5 transition-all duration-300">
+      <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,1)]"></div>
+      
+      <div class="flex justify-between items-center relative z-10">
         <div>
-          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Ingresos del Día</p>
-          <h3 class="text-3xl font-bold text-gray-800 mt-1">S/ 1,450</h3>
+          <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">Ingresos del Día</p>
+          <h3 class="text-3xl font-extrabold text-white">S/ 1,450</h3>
         </div>
-        <div class="p-3 bg-green-50 rounded-full">
-          <i class="pi pi-money-bill text-verde-esmeralda text-xl"></i>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <i class="pi pi-money-bill text-emerald-400 text-xl drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]"></i>
         </div>
       </div>
-      <p class="text-gray-500 text-xs mt-3">Facturado en recepción</p>
+      <p class="text-gray-500 text-xs mt-4 font-medium relative z-10">Facturado en recepción</p>
     </div>
 
     <!-- Tarjeta 3: Muestras Pendientes -->
-    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-orange-400">
-      <div class="flex justify-between items-center">
+    <div class="bg-[#0a0a0c]/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden group hover:bg-white/5 transition-all duration-300">
+      <div class="absolute top-0 left-0 w-1 h-full bg-orange-400 shadow-[0_0_15px_rgba(251,146,60,1)]"></div>
+      
+      <div class="flex justify-between items-center relative z-10">
         <div>
-          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Muestras Pendientes</p>
-          <h3 class="text-3xl font-bold text-gray-800 mt-1">8</h3>
+          <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">Muestras Pendientes</p>
+          <h3 class="text-3xl font-extrabold text-white">8</h3>
         </div>
-        <div class="p-3 bg-orange-50 rounded-full">
-          <i class="pi pi-clock text-orange-400 text-xl"></i>
+        <div class="w-12 h-12 rounded-xl bg-orange-400/10 border border-orange-400/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <i class="pi pi-clock text-orange-400 text-xl drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]"></i>
         </div>
       </div>
-      <p class="text-gray-500 text-xs mt-3">Esperando en tópico</p>
+      <p class="text-gray-500 text-xs mt-4 font-medium relative z-10">Esperando en tópico</p>
     </div>
 
     <!-- Tarjeta 4: Resultados Listos -->
-    <div class="bg-white rounded-lg shadow-sm p-5 border-l-4 border-purple-500">
-      <div class="flex justify-between items-center">
+    <div class="bg-[#0a0a0c]/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden group hover:bg-white/5 transition-all duration-300">
+      <div class="absolute top-0 left-0 w-1 h-full bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,1)]"></div>
+      
+      <div class="flex justify-between items-center relative z-10">
         <div>
-          <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider">Resultados Validados</p>
-          <h3 class="text-3xl font-bold text-gray-800 mt-1">15</h3>
+          <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-1">Resultados Validados</p>
+          <h3 class="text-3xl font-extrabold text-white">15</h3>
         </div>
-        <div class="p-3 bg-purple-50 rounded-full">
-          <i class="pi pi-check-circle text-purple-500 text-xl"></i>
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <i class="pi pi-check-circle text-purple-400 text-xl drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]"></i>
         </div>
       </div>
-      <p class="text-gray-500 text-xs mt-3">Por biólogo de turno</p>
+      <p class="text-gray-500 text-xs mt-4 font-medium relative z-10">Por biólogo de turno</p>
     </div>
-
-    
 
   </div>
 
   <!-- Sección del Gráfico -->
-  <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-    <h2 class="text-lg font-bold text-gray-800 mb-4">Ingresos de los últimos 7 días</h2>
+  <div class="bg-[#0a0a0c]/60 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+    <!-- Brillo sutil de fondo para el gráfico -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-[#f05435] opacity-5 blur-[100px] pointer-events-none"></div>
+
+    <div class="flex items-center justify-between mb-6 relative z-10">
+      <h2 class="text-lg font-bold text-white tracking-wide">Ingresos de los últimos 7 días</h2>
+      <button class="text-gray-400 hover:text-white transition-colors">
+        <i class="pi pi-ellipsis-h text-xl"></i>
+      </button>
+    </div>
     
     <!-- Componente de PrimeNG Chart -->
-    <p-chart type="bar" [data]="datosGrafico" [options]="opcionesGrafico" height="300px"></p-chart>
+    <div class="relative z-10">
+      <p-chart type="bar" [data]="datosGrafico" [options]="opcionesGrafico" height="320px"></p-chart>
+    </div>
   </div>
 
 </div>

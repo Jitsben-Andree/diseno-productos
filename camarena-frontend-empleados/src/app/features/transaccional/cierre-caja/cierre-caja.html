@@ -1,0 +1,153 @@
+<div class="p-2 md:p-4 animate-fadeIn text-gray-300 relative">
+  
+  <!-- Sistema de Notificaciones Flotante Premium -->
+  <div *ngIf="notificacion" 
+       class="fixed top-24 right-8 z-50 px-6 py-4 rounded-xl backdrop-blur-md border shadow-2xl animate-fadeIn flex items-center gap-3"
+       [ngClass]="{
+         'bg-emerald-500/10 border-emerald-500/20 text-emerald-400': notificacion.tipo === 'exito',
+         'bg-red-500/10 border-red-500/20 text-red-400': notificacion.tipo === 'error',
+         'bg-amber-500/10 border-amber-500/20 text-amber-400': notificacion.tipo === 'advertencia'
+       }">
+    <i class="pi text-xl" 
+       [ngClass]="{
+         'pi-check-circle': notificacion.tipo === 'exito',
+         'pi-exclamation-circle': notificacion.tipo === 'error',
+         'pi-exclamation-triangle': notificacion.tipo === 'advertencia'
+       }"></i>
+    <span class="font-medium text-sm">{{ notificacion.mensaje }}</span>
+  </div>
+
+  <!-- Cabecera -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+    <div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">Cierre de Caja Diario</h1>
+      <p class="text-gray-400 text-sm mt-1">Gestión de liquidez, cuadre de turnos y exportación de reportes contables.</p>
+    </div>
+    
+    <!-- Filtro de Fecha y Botón Excel -->
+    <div class="flex flex-col sm:flex-row gap-4">
+      <div class="flex items-center bg-[#070708] border border-white/10 rounded-xl px-4 py-3 shadow-inner focus-within:border-[#f05435] focus-within:ring-1 focus-within:ring-[#f05435]/50 transition-all">
+        <i class="pi pi-calendar text-[#f05435] mr-3"></i>
+        <input type="date" 
+               [ngModel]="fechaFiltro" 
+               (ngModelChange)="cambiarFecha($event)" 
+               class="outline-none text-white bg-transparent text-sm font-bold uppercase tracking-wider cursor-pointer"
+               style="color-scheme: dark;">
+      </div>
+      
+      <button (click)="exportarAExcel()" 
+              class="bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-900/40 transition-all flex items-center justify-center gap-2 text-sm active:scale-95 border border-emerald-500/30 hover:border-emerald-400/50">
+        <i class="pi pi-file-excel text-lg"></i>
+        <span>Exportar a Excel</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tarjetas de Cuadre Financiero (KPIs Glassmorphism) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    
+    <!-- KPI Efectivo -->
+    <div class="bg-[#0a0a0c]/60 border border-white/10 p-6 rounded-3xl backdrop-blur-md relative overflow-hidden group hover:bg-white/[0.02] transition-colors shadow-lg">
+      <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]"></div>
+      <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-3">Efectivo en Cajón</p>
+      <div class="flex items-center justify-between">
+        <h3 class="text-3xl font-black text-white">S/ {{ totalEfectivo | number:'1.2-2' }}</h3>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 drop-shadow-[0_0_5px_rgba(16,185,129,0.2)]">
+          <i class="pi pi-money-bill text-2xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Digital -->
+    <div class="bg-[#0a0a0c]/60 border border-white/10 p-6 rounded-3xl backdrop-blur-md relative overflow-hidden group hover:bg-white/[0.02] transition-colors shadow-lg">
+      <div class="absolute top-0 left-0 w-2 h-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.5)]"></div>
+      <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-3">Pagos Digitales (POS/App)</p>
+      <div class="flex items-center justify-between">
+        <h3 class="text-3xl font-black text-white">S/ {{ totalDigital | number:'1.2-2' }}</h3>
+        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 drop-shadow-[0_0_5px_rgba(59,130,246,0.2)]">
+          <i class="pi pi-credit-card text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Total -->
+    <div class="bg-[#0a0a0c]/60 border border-white/10 p-6 rounded-3xl backdrop-blur-md relative overflow-hidden group hover:bg-white/[0.02] transition-colors shadow-lg">
+      <div class="absolute top-0 left-0 w-2 h-full bg-fuchsia-500 shadow-[0_0_12px_rgba(217,70,239,0.5)]"></div>
+      <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-3">Recaudación Total</p>
+      <div class="flex items-center justify-between">
+        <h3 class="text-3xl font-black text-fuchsia-400 drop-shadow-[0_0_8px_rgba(217,70,239,0.2)]">S/ {{ totalGeneral | number:'1.2-2' }}</h3>
+        <div class="w-12 h-12 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center text-fuchsia-400">
+          <i class="pi pi-chart-line text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Transacciones -->
+    <div class="bg-[#0a0a0c]/60 border border-white/10 p-6 rounded-3xl backdrop-blur-md relative overflow-hidden group hover:bg-white/[0.02] transition-colors shadow-lg">
+      <div class="absolute top-0 left-0 w-2 h-full bg-[#f05435] shadow-[0_0_12px_rgba(240,84,53,0.5)]"></div>
+      <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-3">Flujo de Órdenes</p>
+      <div class="flex items-center justify-between">
+        <h3 class="text-3xl font-black text-white">{{ transacciones.length }}</h3>
+        <div class="w-12 h-12 rounded-xl bg-[#f05435]/10 border border-[#f05435]/20 flex items-center justify-center text-[#f05435]">
+          <i class="pi pi-shopping-cart text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tabla de Transacciones -->
+  <div class="bg-[#0a0a0c]/60 border border-white/10 rounded-3xl backdrop-blur-xl shadow-2xl relative overflow-hidden">
+    <div class="overflow-x-auto custom-scrollbar">
+      <table class="min-w-full text-left border-collapse">
+        <thead class="bg-[#070708] border-b border-white/10">
+          <tr>
+            <th class="px-6 py-5 text-xs font-black text-gray-500 uppercase tracking-widest">Hora / Fecha</th>
+            <th class="px-6 py-5 text-xs font-black text-gray-500 uppercase tracking-widest">N° Ticket</th>
+            <th class="px-6 py-5 text-xs font-black text-gray-500 uppercase tracking-widest">Identidad del Paciente</th>
+            <th class="px-6 py-5 text-xs font-black text-gray-500 uppercase tracking-widest">Cajero Responsable</th>
+            <th class="px-6 py-5 text-xs font-black text-gray-500 uppercase tracking-widest text-center">Medio de Pago</th>
+            <th class="px-6 py-5 text-xs font-black text-gray-500 uppercase tracking-widest text-right">Monto</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          <tr *ngFor="let t of transacciones" class="hover:bg-white/[0.02] transition-colors border-b border-white/5">
+            <td class="px-6 py-5 text-sm text-gray-400 font-mono tracking-wider">{{ t.fecha }}</td>
+            <td class="px-6 py-5 font-mono font-bold text-[#f05435] text-sm tracking-wider">{{ t.ticket }}</td>
+            <td class="px-6 py-5">
+              <p class="font-bold text-white text-sm">{{ t.paciente }}</p>
+              <p class="text-[10px] text-gray-500 font-mono mt-1"><i class="pi pi-id-card mr-1 text-[9px]"></i>{{ t.dni }}</p>
+            </td>
+            <td class="px-6 py-5 text-sm text-gray-400">{{ t.cajero }}</td>
+            <td class="px-6 py-5 text-center">
+              <span class="px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border shadow-sm"
+                    [ngClass]="{
+                      'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]': t.metodoPago === 'EFECTIVO',
+                      'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_8px_rgba(59,130,246,0.15)]': t.metodoPago === 'TARJETA',
+                      'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 shadow-[0_0_8px_rgba(217,70,239,0.15)]': t.metodoPago === 'YAPE'
+                    }">
+                {{ t.metodoPago }}
+              </span>
+            </td>
+            <td class="px-6 py-5 text-right font-black text-white text-base">S/ {{ t.monto | number:'1.2-2' }}</td>
+          </tr>
+          
+          <tr *ngIf="transacciones.length === 0">
+            <td colspan="6" class="px-6 py-16 text-center text-gray-500">
+              <i class="pi pi-receipt text-4xl mb-4 text-gray-600 block opacity-50"></i>
+              <p class="font-bold text-sm">Registro Vacio</p>
+              <p class="text-xs mt-1">No se encontraron transacciones financieras registradas en la fecha seleccionada.</p>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-[#070708] border-t border-white/10" *ngIf="transacciones.length > 0">
+          <tr>
+            <td colspan="5" class="px-6 py-5 text-right text-gray-500 uppercase tracking-widest font-black text-xs">Arqueo Final del Día:</td>
+            <td class="px-6 py-5 text-right text-xl font-black text-fuchsia-400 drop-shadow-[0_0_5px_rgba(217,70,239,0.3)]">S/ {{ totalGeneral | number:'1.2-2' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</div>

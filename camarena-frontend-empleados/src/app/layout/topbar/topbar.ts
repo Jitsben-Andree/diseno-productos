@@ -5,20 +5,17 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-topbar',
+  standalone: true,
   imports: [CommonModule],
-  templateUrl: './topbar.html',
-  styleUrl: './topbar.scss',
+  templateUrl: './topbar.html'
 })
 export class TopbarComponent {
-
 
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Lluqsiy ruray (Método para cerrar sesión)
   lluqsiy() {
     this.authService.cerrarSesion();
     this.router.navigate(['/login']);
   }
 }
-

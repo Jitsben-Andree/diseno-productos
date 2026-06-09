@@ -34,21 +34,38 @@ export class NuevaOrdenComponent implements OnInit {
   ordenGenerada: any = null;
   metodoPago = 'EFECTIVO';
 
+  // Sistema de Notificaciones Premium (Reemplaza los alerts ruidosos)
+  notificacion: any = null;
+
   ngOnInit() {
     this.cargarCatalogo();
+  }
+
+  // Muestra una elegante notificación flotante que se desvanece sola
+  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' = 'exito') {
+    this.notificacion = { mensaje, tipo };
+    setTimeout(() => {
+      this.notificacion = null;
+    }, 4000);
   }
 
   // --- 1. CATÁLOGO ---
   cargarCatalogo() {
     this.catalogoService.listarExamenes().subscribe({
       next: (data) => this.catalogoExamenes = data,
-      error: (err) => console.error("Error cargando catálogo", err)
+      error: (err) => {
+        console.error("Error cargando catálogo", err);
+        this.mostrarNotificacion("Error al conectar con el catálogo de exámenes.", "error");
+      }
     });
   }
 
   // --- 2. PACIENTE ---
   buscarPaciente() {
-    if (!this.dniBusqueda || this.dniBusqueda.length < 8) return;
+    if (!this.dniBusqueda || this.dniBusqueda.length < 8) {
+      this.mostrarNotificacion("Por favor, ingrese un DNI válido de 8 dígitos.", "error");
+      return;
+    }
     
     this.buscandoPaciente = true;
     this.errorPaciente = '';
@@ -58,9 +75,11 @@ export class NuevaOrdenComponent implements OnInit {
       next: (paciente) => {
         this.pacienteActual = paciente;
         this.buscandoPaciente = false;
+        this.mostrarNotificacion(`Paciente ${paciente.nombres} identificado.`, "exito");
       },
       error: (err) => {
-        this.errorPaciente = 'Paciente no encontrado. Vaya a "Pacientes" para registrarlo.';
+        this.errorPaciente = 'Paciente no encontrado en el sistema.';
+        this.mostrarNotificacion("No se encontró ningún paciente con el DNI ingresado.", "error");
         this.buscandoPaciente = false;
       }
     });
@@ -69,25 +88,32 @@ export class NuevaOrdenComponent implements OnInit {
   limpiarPaciente() {
     this.pacienteActual = null;
     this.dniBusqueda = '';
+    this.errorPaciente = '';
   }
 
   // --- 3. CARRITO DE COMPRAS ---
   agregarAlCarrito(examen: any) {
     if (!this.pacienteActual) {
-      alert("Primero busque y seleccione un paciente.");
+      this.mostrarNotificacion("Primero busque y seleccione un paciente activo.", "error");
       return;
     }
+    
     // Evitamos duplicados básicos
     const yaExiste = this.carrito.find(item => item.idExamen === examen.idExamen);
     if (!yaExiste) {
       this.carrito.push(examen);
       this.recalcularTotal();
+      this.mostrarNotificacion(`${examen.descripcion} agregado a la orden.`, "exito");
+    } else {
+      this.mostrarNotificacion("Este examen ya se encuentra agregado en la orden.", "error");
     }
   }
 
   quitarDelCarrito(index: number) {
+    const itemEliminado = this.carrito[index];
     this.carrito.splice(index, 1);
     this.recalcularTotal();
+    this.mostrarNotificacion(`Se removió ${itemEliminado.descripcion} de la orden.`, "exito");
   }
 
   recalcularTotal() {
@@ -96,6 +122,8 @@ export class NuevaOrdenComponent implements OnInit {
 
   // --- 4. FACTURACIÓN (SPRING BOOT) ---
   generarOrden() {
+    if (!this.pacienteActual || this.carrito.length === 0) return;
+    
     this.procesando = true;
     
     // Extraemos solo los IDs de los exámenes que pide Spring Boot
@@ -111,16 +139,19 @@ export class NuevaOrdenComponent implements OnInit {
         this.ordenGenerada = response;
         this.pasoActual = 2; // Avanzamos al cobro
         this.procesando = false;
+        this.mostrarNotificacion("Orden generada con éxito. Proceda al cobro.", "exito");
       },
       error: (err) => {
         console.error("Error al crear la orden", err);
-        alert("Ocurrió un error al generar la orden.");
+        this.mostrarNotificacion("Ocurrió un error al intentar generar la orden.", "error");
         this.procesando = false;
       }
     });
   }
 
   registrarPago() {
+    if (!this.ordenGenerada) return;
+    
     this.procesando = true;
 
     const pagoReq = {
@@ -132,10 +163,11 @@ export class NuevaOrdenComponent implements OnInit {
       next: (res) => {
         this.pasoActual = 3; // Mostrar Ticket final
         this.procesando = false;
+        this.mostrarNotificacion("Pago registrado. Ticket de atención emitido.", "exito");
       },
       error: (err) => {
         console.error("Error en pago", err);
-        alert("No se pudo registrar el pago.");
+        this.mostrarNotificacion("No se pudo completar el registro del pago.", "error");
         this.procesando = false;
       }
     });
@@ -148,5 +180,6 @@ export class NuevaOrdenComponent implements OnInit {
     this.ordenGenerada = null;
     this.pasoActual = 1;
     this.metodoPago = 'EFECTIVO';
+    this.mostrarNotificacion("Módulo de ventas restablecido.");
   }
 }

@@ -1,62 +1,154 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      
-  <!-- Contenedor del Formulario -->
-  <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+<div class="login-wrapper min-h-screen w-full flex items-center justify-center p-4 overflow-hidden relative">
+  
+  <!-- Círculos de luz ambiental (Glow effects configurados en SCSS) -->
+  <div class="absolute glow-circle-1"></div>
+  <div class="absolute glow-circle-2"></div>
+  <div class="absolute glow-circle-3"></div>
+
+  <!-- Contenedor Principal (2 Columnas en pantallas grandes) -->
+  <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
     
-    <!-- Encabezado funcional -->
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-800">Laboratorio Camarena</h2>
-      <p class="text-sm text-gray-500 mt-2">Panel Administrativo</p>
-    </div>
+    <!-- COLUMNA IZQUIERDA: Ilustración Line-Art Minimalista -->
+    <div class="hidden lg:flex lg:col-span-6 flex-col justify-center items-center text-left p-6">
+      <div class="relative w-full max-w-md">
+        
+        <!-- Blobs decorativos de fondo similares a las nubes naranjas de la referencia -->
+        <div class="absolute w-40 h-40 bg-[#f05435] opacity-20 rounded-full blur-3xl -top-10 -left-10 animate-pulse"></div>
+        <div class="absolute w-32 h-32 bg-orange-400 opacity-25 rounded-full blur-2xl bottom-10 right-10"></div>
+        
+        <!-- Ilustración Premium SVG de Personaje trabajando/relajado -->
+        <svg viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full drop-shadow-2xl">
+          <!-- Silla de descanso -->
+          <path d="M120 320 L180 180 L280 200 L320 320" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <path d="M180 180 L100 240 L180 320" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <!-- Soporte de Silla -->
+          <line x1="160" y1="280" x2="120" y2="350" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="240" y1="290" x2="280" y2="350" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          
+          <!-- Nubes/Blobs de color naranja suave (Acentos estéticos del dibujo) -->
+          <path d="M80 300 C60 300 50 280 65 265 C55 250 70 230 90 240 C100 230 120 240 115 255 C125 270 110 300 80 300 Z" fill="#f05435" fill-opacity="0.8"/>
+          <path d="M380 240 C365 240 355 225 365 210 C355 195 370 180 385 190 C395 180 410 190 405 205 C415 215 405 240 380 240 Z" fill="#f05435" fill-opacity="0.8"/>
 
-    <!-- Alerta de Error (Solo aparece si hay un error del servidor) -->
-    <div *ngIf="mensajeError" class="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center">
-      {{ mensajeError }}
-    </div>
+          <!-- Cuerpo del Personaje en descanso -->
+          <path d="M140 200 C150 160 190 140 210 170 L250 220 L350 260 L330 310 L240 270 L190 280 Z" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+          <!-- Cabeza -->
+          <circle cx="190" cy="130" r="25" stroke="white" stroke-width="4"/>
+          <!-- Lentes de Sol (Detalle cool de la referencia) -->
+          <path d="M175 130 Q190 125 205 130" stroke="white" stroke-width="3"/>
+          <path d="M175 130 H185 L180 138 Z" fill="white"/>
+          <path d="M193 130 H203 L198 138 Z" fill="white"/>
+          <!-- Laptop en las piernas -->
+          <path d="M220 210 L270 200 L290 160" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="220" y1="210" x2="270" y2="200" stroke="#f05435" stroke-width="4"/>
+          
+          <!-- Bebida/Vaso al costado -->
+          <path d="M310 180 L330 180 L325 220 L315 220 Z" stroke="white" stroke-width="3"/>
+          <!-- Rodaja de limón decorativa -->
+          <circle cx="335" cy="175" r="10" stroke="#f05435" stroke-width="2"/>
+          <line x1="335" y1="165" x2="335" y2="185" stroke="#f05435" stroke-width="1.5"/>
+          <line x1="325" y1="175" x2="345" y2="175" stroke="#f05435" stroke-width="1.5"/>
+        </svg>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      
-      <!-- Campo Email -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-        <input 
-          type="email" 
-          formControlName="email"
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="admin@camarena.com"
-          [ngClass]="{'border-red-500': f['email'].invalid && f['email'].touched}"
-        >
-        <!-- Validación UX: Mensaje si está vacío o es inválido -->
-        <div *ngIf="f['email'].invalid && f['email'].touched" class="text-red-500 text-xs mt-1">
-          Ingrese un correo válido.
+        <!-- Mensajes debajo de la ilustración -->
+        <div class="mt-8 text-left">
+          <h2 class="text-3xl font-extrabold text-white tracking-wide">Laboratorio Camarena</h2>
+          <p class="text-gray-400 mt-2 text-sm max-w-sm leading-relaxed">
+            Gestione sus tareas analíticas con mayor rapidez utilizando herramientas de automatización de última generación.
+          </p>
         </div>
       </div>
+    </div>
 
-      <!-- Campo Contraseña -->
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-        <input 
-          type="password" 
-          formControlName="contrasena"
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="••••••••"
-          [ngClass]="{'border-red-500': f['contrasena'].invalid && f['contrasena'].touched}"
-        >
-         <div *ngIf="f['contrasena'].invalid && f['contrasena'].touched" class="text-red-500 text-xs mt-1">
-          La contraseña es obligatoria.
+    <!-- COLUMNA DERECHA: Tarjeta de Login (Glassmorphism de alta fidelidad) -->
+    <div class="col-span-1 lg:col-span-6 flex justify-center">
+      <div class="w-full max-w-md login-card p-8 rounded-3xl border border-white/10 backdrop-blur-xl relative overflow-hidden shadow-2xl">
+        
+        <!-- Encabezado del Formulario -->
+        <div class="mb-8 text-left">
+          <h1 class="text-3xl font-extrabold text-white tracking-tight">Welcome back!</h1>
+          <p class="text-gray-400 text-xs mt-2 font-medium">
+            Acceda de forma segura al panel administrativo del laboratorio.
+          </p>
         </div>
+
+        <!-- Alerta de Error (Dinámica) -->
+        <div *ngIf="mensajeError" class="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs text-center font-medium animate-fadeIn">
+          <i class="pi pi-exclamation-circle mr-1"></i> {{ mensajeError }}
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+          
+          <!-- Campo Email -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">Email*</label>
+            <div class="relative">
+              <input 
+                type="email" 
+                formControlName="email"
+                class="w-full px-4 py-3 bg-white text-gray-900 font-medium rounded-xl outline-none focus:ring-4 focus:ring-[#f05435]/30 transition-all placeholder-gray-400 text-sm border-0"
+                placeholder="email@example.com"
+                [ngClass]="{'ring-2 ring-red-500/50': f['email'].invalid && f['email'].touched}"
+              >
+            </div>
+            <!-- Validación UX -->
+            <div *ngIf="f['email'].invalid && f['email'].touched" class="text-red-400 text-xs mt-1 font-medium pl-1">
+              Ingrese una dirección de correo válida.
+            </div>
+          </div>
+
+          <!-- Campo Contraseña -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center">
+              <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">Password*</label>
+            </div>
+            <div class="relative">
+              <input 
+                [type]="mostrarContrasena ? 'text' : 'password'" 
+                formControlName="contrasena"
+                class="w-full px-4 py-3 bg-white text-gray-900 font-medium rounded-xl outline-none focus:ring-4 focus:ring-[#f05435]/30 transition-all placeholder-gray-400 text-sm border-0"
+                placeholder="Ingrese su contraseña"
+                [ngClass]="{'ring-2 ring-red-500/50': f['contrasena'].invalid && f['contrasena'].touched}"
+              >
+              <!-- Botón interno de mostrar/ocultar contraseña -->
+              <button 
+                type="button" 
+                (click)="toggleMostrarContrasena()"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 transition-colors">
+                <i class="pi text-lg" [ngClass]="mostrarContrasena ? 'pi-eye-slash' : 'pi-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="f['contrasena'].invalid && f['contrasena'].touched" class="text-red-400 text-xs mt-1 font-medium pl-1">
+              La contraseña es obligatoria (mínimo 4 caracteres).
+            </div>
+          </div>
+
+          <br>
+
+          <!-- Botón de Envío principal -->
+          <div class="pt-2">
+            <button 
+              type="submit" 
+              [disabled]="loginForm.invalid || cargando"
+              class="w-full bg-[#f05435] hover:bg-[#d94426] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-orange-950/20 disabled:opacity-40 flex justify-center items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm"
+            >
+              <span *ngIf="!cargando">Log in</span>
+              <span *ngIf="cargando" class="flex items-center gap-2">
+                <i class="pi pi-spin pi-spinner"></i> Autenticando...
+              </span>
+            </button>
+          </div>
+
+          <!-- Separador "Or Login with" -->
+          <div class="relative my-6 flex items-center justify-center">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-white/10"></div>
+            </div>
+            <span class="relative px-3 bg-[#111] text-[11px] text-gray-500 uppercase tracking-widest font-semibold">Or Login with</span>
+          </div>
+
+        </form>
       </div>
+    </div>
 
-      <!-- Botón de Envío (Maneja el estado de Carga) -->
-      <button 
-        type="submit" 
-        [disabled]="loginForm.invalid || cargando"
-        class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50 flex justify-center items-center transition-colors"
-      >
-        <span *ngIf="!cargando">Ingresar al Sistema</span>
-        <span *ngIf="cargando">Validando credenciales...</span>
-      </button>
-
-    </form>
   </div>
 </div>

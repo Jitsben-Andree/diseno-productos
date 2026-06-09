@@ -1,0 +1,101 @@
+// Definición de variables de color del tema
+$bg-dark: #070708;
+$glow-orange: rgba(240, 84, 53, 0.45);
+$glow-soft: rgba(251, 146, 60, 0.3);
+
+// Contenedor principal con fondo ultra oscuro
+.login-wrapper {
+  background-color: $bg-dark;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 1;
+}
+
+// Tarjeta con efecto de vidrio esmerilado (Glassmorphism)
+.login-card {
+  background: rgba(17, 17, 19, 0.75);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  z-index: 5;
+}
+
+// Configuración de las luces de fondo difuminadas (Ambient Light Effect)
+.glow-circle-1 {
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, $glow-orange 0%, rgba(0,0,0,0) 70%);
+  filter: blur(80px);
+  top: -10%;
+  left: -10%;
+  opacity: 0.7;
+  pointer-events: none;
+  animation: floatLight 12s ease-in-out infinite alternate;
+}
+
+.glow-circle-2 {
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, $glow-soft 0%, rgba(0,0,0,0) 75%);
+  filter: blur(100px);
+  bottom: -15%;
+  right: -10%;
+  opacity: 0.6;
+  pointer-events: none;
+  animation: floatLight2 15s ease-in-out infinite alternate;
+}
+
+.glow-circle-3 {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 84, 53, 0.25) 0%, rgba(0,0,0,0) 70%);
+  filter: blur(60px);
+  top: 40%;
+  left: 30%;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+// Animaciones fluidas para simular luces ambientales reales
+@keyframes floatLight {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(40px, 30px) scale(1.15);
+  }
+}
+
+@keyframes floatLight2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-50px, -40px) scale(1.1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+// Estilizaciones personalizadas de inputs
+input, select {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(240, 84, 53, 0.15);
+  }
+}

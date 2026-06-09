@@ -20,12 +20,14 @@ export class LoginComponent {
   loginForm: FormGroup;
   cargando = false;
   mensajeError = '';
+  mostrarContrasena = false; // Permite alternar la visibilidad de la contraseña
 
   constructor() {
-    // Inicialización del formulario con validaciones
+    // Inicialización del formulario con validaciones robustas
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      contrasena: ['', [Validators.required, Validators.minLength(4)]]
+      contrasena: ['', [Validators.required, Validators.minLength(4)]],
+      recordarme: [false]
     });
   }
 
@@ -34,8 +36,11 @@ export class LoginComponent {
     return this.loginForm.controls;
   }
 
+  toggleMostrarContrasena() {
+    this.mostrarContrasena = !this.mostrarContrasena;
+  }
+
   onSubmit() {
-    // Si el formulario es inválido, no hace nada
     if (this.loginForm.invalid) return;
 
     this.cargando = true;
@@ -45,7 +50,6 @@ export class LoginComponent {
 
     this.authService.login(credenciales).subscribe({
       next: (response) => {
-        // Redirigimos al usuario al dashboard principal
         this.router.navigate(['/dashboard']); 
       },
       error: (err) => {
@@ -57,5 +61,11 @@ export class LoginComponent {
         }
       }
     });
+  }
+
+  // Mocks de inicio de sesión con redes sociales
+  loginConSocial(proveedor: string) {
+    console.log(`Iniciando sesión de prueba con ${proveedor}`);
+    // Aquí puedes enlazar tu lógica de OAuth2 si es necesario más adelante
   }
 }

@@ -15,12 +15,17 @@ export class InventarioComponent implements OnInit {
   private inventarioService = inject(InventarioService);
   private fb = inject(FormBuilder);
 
+  // Estados principales
   insumos: any[] = [];
   cargando = true;
   
+  // Estados de flujos de acción
   mostrarModal = false;
   guardando = false;
   inventarioForm: FormGroup;
+
+  // Sistema de Notificaciones Premium (Reemplaza los alert() obsoletos)
+  notificacion: any = null;
 
   constructor() {
     this.inventarioForm = this.fb.group({
@@ -35,6 +40,14 @@ export class InventarioComponent implements OnInit {
     this.cargarInventario();
   }
 
+  // Despliega un elegante mensaje en pantalla que se desvanece solo
+  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' | 'advertencia' = 'exito') {
+    this.notificacion = { mensaje, tipo };
+    setTimeout(() => {
+      this.notificacion = null;
+    }, 4000);
+  }
+
   cargarInventario() {
     this.cargando = true;
     this.inventarioService.listarInsumos().subscribe({
@@ -44,6 +57,7 @@ export class InventarioComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar inventario', err);
+        this.mostrarNotificacion("Error al conectar con la base de datos de almacén.", "error");
         this.insumos = [];
         this.cargando = false;
       }
@@ -69,11 +83,12 @@ export class InventarioComponent implements OnInit {
       next: (res) => {
         this.mostrarModal = false;
         this.guardando = false;
-        this.cargarInventario(); // Recargar tabla
+        this.cargarInventario(); // Recargar la tabla automáticamente
+        this.mostrarNotificacion(`Insumo "${request.nombreInsumo}" reabastecido con éxito.`, "exito");
       },
       error: (err) => {
         console.error('Error al guardar', err);
-        alert('Ocurrió un error al intentar ingresar el stock al servidor.');
+        this.mostrarNotificacion("No se pudo registrar el ingreso de stock al servidor.", "error");
         this.guardando = false;
       }
     });

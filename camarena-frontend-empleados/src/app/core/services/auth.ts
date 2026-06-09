@@ -15,7 +15,7 @@ export class AuthService {
   private tokenKey = 'jwt_camarena';
 
   /**
-   * Envia las credenciales al backend y, si es exitoso, guarda el token.
+   * Envia las credenciales al backend y, si es exitoso, guarda el token y el rol.
    */
   login(credenciales: { email: string; contrasena: string }): Observable<any> {
     // Nota: el backend de Spring Boot espera las propiedades "email" y "password"
@@ -30,6 +30,11 @@ export class AuthService {
         // Interceptamos la respuesta exitosa para guardar el token
         if (response && response.token) {
           localStorage.setItem(this.tokenKey, response.token);
+          
+          // NUEVO: Guardamos el rol para que el Sidebar pueda leerlo y habilitar las opciones
+          if (response.rol) {
+             localStorage.setItem('rol_camarena', response.rol);
+          }
         }
       })
     );
@@ -37,6 +42,7 @@ export class AuthService {
 
   cerrarSesion(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('rol_camarena'); // Limpiamos el rol al salir
   }
 
   obtenerToken(): string | null {

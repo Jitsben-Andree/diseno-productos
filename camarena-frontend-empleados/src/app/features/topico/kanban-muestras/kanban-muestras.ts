@@ -11,7 +11,7 @@ import { MuestraService } from '../../../core/services/muestras';
 })
 export class KanbanMuestrasComponent implements OnInit {
   private muestraService = inject(MuestraService);
-  private router = inject(Router); // <-- Inyectamos el router para manejar el error 403
+  private router = inject(Router);
 
   // Estados del Tablero
   ordenesPendientes: any[] = [];
@@ -22,20 +22,31 @@ export class KanbanMuestrasComponent implements OnInit {
   muestrasGeneradas: any[] = [];
   procesando = false;
 
+  // Sistema de Notificaciones Flotantes Premium
+  notificacion: any = null;
+
   ngOnInit() {
     this.cargarPendientes();
+  }
+
+  // Despliega una elegante notificación en pantalla
+  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' = 'exito') {
+    this.notificacion = { mensaje, tipo };
+    setTimeout(() => {
+      this.notificacion = null;
+    }, 4000);
   }
 
   cargarPendientes() {
     // Validación de seguridad frontal
     const token = localStorage.getItem('jwt_camarena');
     if (!token) {
-      alert("Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
-      this.router.navigate(['/login']);
+      this.mostrarNotificacion("Su sesión ha expirado. Redirigiendo...", "error");
+      setTimeout(() => this.router.navigate(['/login']), 2000);
       return;
     }
 
-    // Llamada REAL al backend para traer las órdenes pagadas
+    // Llamada al backend para traer las órdenes pagadas
     this.muestraService.obtenerOrdenesPendientes().subscribe({
       next: (data) => {
         this.ordenesPendientes = data;
@@ -45,8 +56,10 @@ export class KanbanMuestrasComponent implements OnInit {
         
         // Manejo específico del error 403 (Acceso Denegado / Forbidden)
         if (err.status === 403) {
-          alert('Acceso Denegado: No tienes el rol necesario o tu sesión expiró.');
-          this.router.navigate(['/login']);
+          this.mostrarNotificacion("Acceso Denegado: Rol insuficiente o sesión expirada.", "error");
+          setTimeout(() => this.router.navigate(['/login']), 2500);
+        } else {
+          this.mostrarNotificacion("Error al conectar con el servidor.", "error");
         }
         
         this.ordenesPendientes = [];
@@ -59,7 +72,7 @@ export class KanbanMuestrasComponent implements OnInit {
     this.procesando = true;
     this.pacienteEnAtencion = orden;
     
-    // Llamada REAL al backend para generar códigos de barras físicos en la BD
+    // Llamada al backend para generar códigos de barras físicos en la BD
     this.muestraService.generarCodigos(orden.idOrden || orden.id).subscribe({
       next: (muestras) => {
         this.muestrasGeneradas = muestras;
@@ -69,10 +82,11 @@ export class KanbanMuestrasComponent implements OnInit {
           (o.idOrden || o.id) !== (orden.idOrden || orden.id)
         );
         this.procesando = false;
+        this.mostrarNotificacion(`Paciente ${orden.nombrePaciente} ingresado a box de extracción.`, "exito");
       },
       error: (err) => {
         console.error('Error al generar códigos de barras', err);
-        alert('Hubo un error al conectar con el servidor para generar los códigos.');
+        this.mostrarNotificacion("Error al generar las etiquetas de códigos de barras.", "error");
         this.pacienteEnAtencion = null;
         this.procesando = false;
       }
@@ -83,16 +97,16 @@ export class KanbanMuestrasComponent implements OnInit {
   marcarTomada(muestra: any) {
     this.procesando = true;
     
-    // Llamada REAL al backend: Marca como tomada y DESCUENTA el inventario
+    // Llamada al backend: Marca como tomada y descuenta del inventario
     this.muestraService.marcarTomada(muestra.idMuestra || muestra.id).subscribe({
       next: (muestraActualizada) => {
-        // Actualizamos el estado visualmente
         muestra.estadoMuestra = 'TOMADA';
         this.procesando = false;
+        this.mostrarNotificacion(`Tubo ${muestra.tipoTuboRequerido} de ${muestra.nombreExamen} tomado correctamente.`, "exito");
       },
       error: (err) => {
         console.error('Error al marcar muestra como tomada', err);
-        alert('Error al procesar la muestra. Verifique si hay suficiente stock en el inventario.');
+        this.mostrarNotificacion("Falta de insumos: Verifique stock de tubos en inventario.", "error");
         this.procesando = false;
       }
     });
@@ -107,6 +121,7 @@ export class KanbanMuestrasComponent implements OnInit {
   // Mueve al paciente a la columna 3 y limpia el área central
   finalizarAtencion() {
     this.pacientesCompletados.unshift(this.pacienteEnAtencion); // Lo agregamos a completados
+    this.mostrarNotificacion(`Atención de ${this.pacienteEnAtencion.nombrePaciente} finalizada. Muestras listas para envío.`, "exito");
     this.pacienteEnAtencion = null; // Limpiamos la caja central
     this.muestrasGeneradas = [];
   }

@@ -33,7 +33,6 @@ public class CatalogoServiceImpl implements CatalogoService {
     @Override
     @Transactional
     public ExamenResponse crearExamen(ExamenRequest request) {
-        // Regla de Negocio: No permitir códigos duplicados
         if (catalogoRepository.existsByOcodigo(request.getCodigo())) {
             throw new RuntimeException("Error: El código de examen ya existe en el catálogo.");
         }
@@ -46,7 +45,6 @@ public class CatalogoServiceImpl implements CatalogoService {
                 .build();
 
         CatalogoExamenes examenGuardado = catalogoRepository.save(nuevoExamen);
-
         return mapearAResponse(examenGuardado);
     }
 
@@ -63,19 +61,31 @@ public class CatalogoServiceImpl implements CatalogoService {
         CatalogoExamenes examen = catalogoRepository.findById(idExamen)
                 .orElseThrow(() -> new RuntimeException("Error: Examen no encontrado."));
 
+        // 1. Guardamos el parámetro (Nombre y Unidad)
         ParametrosClinicos parametro = ParametrosClinicos.builder()
                 .examen(examen)
                 .onombre(request.getNombre())
                 .unidad(request.getUnidad())
                 .build();
 
-        parametroRepository.save(parametro);
+        ParametrosClinicos paramGuardado = parametroRepository.save(parametro);
+
+        // 2. Guardamos INMEDIATAMENTE su Rango Normal con los valores que llegaron desde Angular
+        RangosReferencia rango = RangosReferencia.builder()
+                .parametro(paramGuardado)
+                .osexoAplica(request.getSexoAplica() != null ? request.getSexoAplica() : "A")
+                .oedadMinAnios(0)   // Edad por defecto (Desde bebés)
+                .oedadMaxAnios(120) // Edad por defecto (Hasta ancianos)
+                .ovalorMin(request.getValorMin())
+                .ovalorMax(request.getValorMax())
+                .build();
+
+        rangoRepository.save(rango);
     }
 
     @Override
     @Transactional
     public void agregarRangoAParametro(Integer idParametro, RangoRequest request) {
-        // Reglas de Negocio Lógicas
         if (request.getEdadMinAnios() > request.getEdadMaxAnios()) {
             throw new RuntimeException("Error: La edad mínima no puede ser mayor a la máxima.");
         }
@@ -98,7 +108,6 @@ public class CatalogoServiceImpl implements CatalogoService {
         rangoRepository.save(rango);
     }
 
-    // Método auxiliar (Mapper)
     private ExamenResponse mapearAResponse(CatalogoExamenes examen) {
         return ExamenResponse.builder()
                 .idExamen(examen.getOid_examen())

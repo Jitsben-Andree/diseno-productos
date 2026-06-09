@@ -65,6 +65,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/usuario/usuario').then((m) => m.UsuariosComponent),
       },
+      {
+        path: 'caja',
+        loadComponent: () =>
+          import('./features/transaccional/cierre-caja/cierre-caja').then((m) => m.CierreCajaComponent),
+      },
     ],
   },
 

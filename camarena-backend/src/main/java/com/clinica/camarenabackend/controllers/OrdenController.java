@@ -41,7 +41,7 @@ public class OrdenController {
         return ResponseEntity.ok("Pago registrado correctamente. La orden ha pasado a Tópico.");
     }
 
-    // NUEVO: Este es el endpoint exacto que Angular estaba buscando y no encontraba
+    // Este es el endpoint exacto que Angular estaba buscando y no encontraba
     @GetMapping("/pendientes-topico")
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPCION') or hasRole('BIOLOGO')")
     public ResponseEntity<List<OrdenResponse>> listarPendientesTopico() {

@@ -6,8 +6,9 @@ import { TopbarComponent } from '../topbar/topbar';
 
 @Component({
   selector: 'app-main-layout',
+  standalone: true,
   imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss',
+  styleUrl: './main-layout.scss', // Si tienes estilos extra, van aquí
 })
 export class MainLayoutComponent {}

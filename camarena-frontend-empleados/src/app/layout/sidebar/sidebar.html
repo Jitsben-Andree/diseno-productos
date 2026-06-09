@@ -1,98 +1,122 @@
-<!-- Lluq'i waqaychana (Contenedor lateral izquierdo) -->
-<aside class="w-64 bg-azul-clinico text-white flex flex-col h-full shadow-lg">
+<!-- Contenedor lateral izquierdo (Dark Glassmorphism) -->
+<aside class="w-64 bg-[#0a0a0c]/95 backdrop-blur-xl text-gray-400 flex flex-col h-full border-r border-white/5">
   
-  <!-- Umalliq (Header del Logo) -->
-  <div class="h-16 flex items-center justify-center border-b border-blue-800">
-    <i class="pi pi-shield text-2xl mr-2 text-verde-esmeralda"></i>
-    <span class="font-bold text-lg tracking-wider">Camarena ERP</span>
+  <!-- Cabecera del Logo -->
+  <div class="h-20 flex items-center justify-center border-b border-white/5 relative overflow-hidden">
+    <!-- Pequeño brillo detrás del logo -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#f05435]/10 to-transparent opacity-50"></div>
+    <i class="pi pi-shield text-3xl mr-3 text-[#f05435] relative z-10 drop-shadow-[0_0_10px_rgba(240,84,53,0.5)]"></i>
+    <span class="font-extrabold text-xl tracking-widest text-white relative z-10">CAMARENA</span>
   </div>
 
-  <!-- Ñankuna (Rutas de navegación) -->
-  <nav class="flex-1 overflow-y-auto py-4">
-    <ul class="space-y-1">
+  <!-- Rutas de navegación protegidas por Roles -->
+  <!-- OJO: Se ha configurado routerLinkActive para que pinte de naranja el borde y el texto -->
+  <nav class="flex-1 overflow-y-auto py-6 custom-scrollbar">
+    <ul class="space-y-1.5 px-3">
       
-      <!-- Qallariy (Dashboard Admin) -->
-      <li>
-        <a routerLink="/dashboard" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-chart-bar mr-3"></i>
-          Qallariy (Dashboard)
+      <!-- Panel Principal (Dashboard Admin) -->
+      <li *ngIf="isAdmin">
+        <a routerLink="/dashboard" 
+           routerLinkActive="bg-white/5 border-l-[#f05435] text-white" 
+           [routerLinkActiveOptions]="{exact: true}"
+           class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+          <i class="pi pi-chart-bar mr-3 text-lg" [ngClass]="{'text-[#f05435]': true}"></i>
+          Panel Principal
         </a>
       </li>
 
-      <!-- Recepción y Transaccional (Flujo 1.3) -->
-      <li class="pt-4 pb-2 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        Chaskiy (Recepción)
-      </li>
-      <li>
-        <a routerLink="/pacientes" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-users mr-3"></i>
-          Unquqkuna (Pacientes)
-        </a>
-      </li>
-      <li>
-        <a routerLink="/transaccional" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-shopping-cart mr-3"></i>
-          Musuq Mañakuy (Nueva Orden)
-        </a>
-      </li>
+      <!-- Recepción y Transaccional (Recepcionista y Admin) -->
+      <ng-container *ngIf="isRecepcion">
+        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+          Recepción
+        </li>
+        <li>
+          <a routerLink="/pacientes" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-users mr-3 text-lg transition-colors group-hover:text-[#f05435]"></i>
+            Pacientes
+          </a>
+        </li>
+        <li>
+          <a routerLink="/transaccional" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-shopping-cart mr-3 text-lg"></i>
+            Nueva Orden
+          </a>
+        </li>
+      </ng-container>
 
-      <!-- Tópico y Logística (Flujo 1.4 y 3.3) -->
-      <li class="pt-4 pb-2 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        Yawar Hurquy (Tópico)
-      </li>
-      <li>
-        <a routerLink="/topico" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-list mr-3"></i>
-          Muestrakuna (Toma de Muestras)
-        </a>
-      </li>
+      <!-- Tópico y Logística -->
+      <ng-container *ngIf="isRecepcion || isBiologo">
+        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+          Tópico
+        </li>
+        <li>
+          <a routerLink="/topico" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-check-square mr-3 text-lg"></i>
+            Toma de Muestras
+          </a>
+        </li>
+      </ng-container>
 
-      <!-- Laboratorio y Resultados (Flujo 1.5) -->
-      <li class="pt-4 pb-2 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        Yachay Wasi (Laboratorio)
-      </li>
-      <li>
-        <a routerLink="/resultados" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-microchip mr-3"></i>
-          Lluqsiyninkuna (Resultados)
-        </a>
-      </li>
+      <!-- Laboratorio y Resultados -->
+      <ng-container *ngIf="isBiologo">
+        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+          Laboratorio
+        </li>
+        <li>
+          <a routerLink="/resultados" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-microchip mr-3 text-lg"></i>
+            Resultados Clínicos
+          </a>
+        </li>
+      </ng-container>
 
-
-
-      <li class="pt-4 pb-2 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        inventario
-      </li>
-      <li>
-        <a routerLink="/inventario" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-list mr-3"></i>
-          inventario
-        </a>
-      </li>
-
-
-      <li class="pt-4 pb-2 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        catalogoExamenes
-      </li>
-      <li>
-        <a routerLink="/catalogo" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-list mr-3"></i>
-          CATALOGO
-        </a>
-      </li>
-
-
-      <li class="pt-4 pb-2 px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-        Roles
-      </li>
-      <li>
-        <a routerLink="/personal" routerLinkActive="bg-blue-800 border-l-4 border-verde-esmeralda" class="flex items-center px-6 py-3 hover:bg-blue-800 transition-colors cursor-pointer text-sm">
-          <i class="pi pi-list mr-3"></i>
-          Roles
-        </a>
-      </li>
+      <!-- Administración Pura -->
+      <ng-container *ngIf="isAdmin">
+        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+          Administración
+        </li>
+        <li>
+          <a routerLink="/inventario" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-box mr-3 text-lg"></i>
+            Inventario Logístico
+          </a>
+        </li>
+        <li>
+          <a routerLink="/catalogo" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-book mr-3 text-lg"></i>
+            Catálogo Exámenes
+          </a>
+        </li>
+        <li>
+          <a routerLink="/personal" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-id-card mr-3 text-lg"></i>
+            Gestión Personal
+          </a>
+        </li>
+        <li>
+          <a routerLink="/caja" 
+             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
+             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
+            <i class="pi pi-wallet mr-3 text-lg"></i>
+            Cierre de Caja 
+          </a>
+        </li>
+      </ng-container>
 
     </ul>
   </nav>
-
 </aside>
