@@ -3,6 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CajaService } from '../../../core/services/cajacierre';
 
+// Interfaz para tipado fuerte con los datos que envía Spring Boot
+interface Transaccion {
+  ticket: string;
+  paciente: string;
+  dni: string;
+  fecha: string;
+  metodoPago: string;
+  monto: number;
+  cajero: string;
+}
+
 @Component({
   selector: 'app-cierre-caja',
   standalone: true,
@@ -13,7 +24,8 @@ export class CierreCajaComponent implements OnInit {
   private cajaService = inject(CajaService);
 
   fechaFiltro: string = '';
-  transacciones: any[] = [];
+  transacciones: Transaccion[] = [];
+  cargando: boolean = false; // Estado de sincronización con BD
   
   // Contadores
   totalEfectivo: number = 0;
@@ -44,14 +56,19 @@ export class CierreCajaComponent implements OnInit {
   }
 
   cargarDatos() {
+    this.cargando = true; // Mostramos el spinner
     this.cajaService.obtenerCierreDiario(this.fechaFiltro).subscribe({
-      next: (data) => {
+      next: (data: Transaccion[]) => {
         this.transacciones = data;
         this.calcularTotales();
+        this.cargando = false; // Ocultamos el spinner
       },
       error: (err) => {
         console.error("Error al cargar cierre de caja", err);
-        this.mostrarNotificacion("Error al recuperar el historial de transacciones.", "error");
+        this.mostrarNotificacion("Error al recuperar el historial de transacciones del servidor.", "error");
+        this.transacciones = [];
+        this.calcularTotales();
+        this.cargando = false;
       }
     });
   }
@@ -82,10 +99,10 @@ export class CierreCajaComponent implements OnInit {
       // 1. Crear las cabeceras del Excel
       let csvContent = "Fecha/Hora,Ticket,DNI,Paciente,Cajero,Metodo de Pago,Monto (S/)\n";
 
-      // 2. Llenar las filas con los datos de las transacciones
+      // 2. Llenar las filas con los datos de las transacciones reales
       this.transacciones.forEach(t => {
         // Reemplazamos comas en los nombres por espacios para no romper el CSV
-        const pacienteLimpio = t.paciente.replace(/,/g, ' '); 
+        const pacienteLimpio = t.paciente ? t.paciente.replace(/,/g, ' ') : 'Desconocido'; 
         csvContent += `"${t.fecha}","${t.ticket}","${t.dni}","${pacienteLimpio}","${t.cajero}","${t.metodoPago}",${t.monto}\n`;
       });
 
@@ -95,7 +112,7 @@ export class CierreCajaComponent implements OnInit {
       csvContent += `,,,,,"TOTAL GENERAL",${this.totalGeneral}\n`;
 
       // 4. Crear el archivo físico (Blob) y forzar la descarga
-      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }); // \uFEFF asegura soporte para tildes (UTF-8 BOM)
+      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }); // \uFEFF asegura soporte para tildes
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement("a");
