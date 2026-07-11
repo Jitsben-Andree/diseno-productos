@@ -1,122 +1,139 @@
-<!-- Contenedor lateral izquierdo (Dark Glassmorphism) -->
-<aside class="w-64 bg-[#0a0a0c]/95 backdrop-blur-xl text-gray-400 flex flex-col h-full border-r border-white/5">
+<!-- Contenedor lateral: Usamos el azul clínico de tu paleta -->
+<aside class="w-64 bg-azul-clinico text-white flex flex-col h-full shadow-2xl relative z-20">
   
-  <!-- Cabecera del Logo -->
-  <div class="h-20 flex items-center justify-center border-b border-white/5 relative overflow-hidden">
-    <!-- Pequeño brillo detrás del logo -->
-    <div class="absolute inset-0 bg-gradient-to-b from-[#f05435]/10 to-transparent opacity-50"></div>
-    <i class="pi pi-shield text-3xl mr-3 text-[#f05435] relative z-10 drop-shadow-[0_0_10px_rgba(240,84,53,0.5)]"></i>
-    <span class="font-extrabold text-xl tracking-widest text-white relative z-10">CAMARENA</span>
+  <!-- Cabecera del Logo (Zona estática) -->
+  <div class="h-20 flex items-center justify-center border-b border-white/10 px-6 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="bg-white/10 p-2 rounded-xl border border-white/20 backdrop-blur-sm">
+        <i class="pi pi-shield text-xl text-verde-esmeralda"></i>
+      </div>
+      <div>
+        <h1 class="font-extrabold tracking-wide text-lg leading-tight">Camarena</h1>
+        <p class="text-[10px] text-blue-200 uppercase tracking-widest font-semibold">ERP Clínico</p>
+      </div>
+    </div>
   </div>
 
-  <!-- Rutas de navegación protegidas por Roles -->
-  <!-- OJO: Se ha configurado routerLinkActive para que pinte de naranja el borde y el texto -->
+  <!-- Rutas de navegación (Zona con Scroll) -->
   <nav class="flex-1 overflow-y-auto py-6 custom-scrollbar">
-    <ul class="space-y-1.5 px-3">
+    <ul class="space-y-1">
       
-      <!-- Panel Principal (Dashboard Admin) -->
-      <li *ngIf="isAdmin">
-        <a routerLink="/dashboard" 
-           routerLinkActive="bg-white/5 border-l-[#f05435] text-white" 
-           [routerLinkActiveOptions]="{exact: true}"
-           class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-          <i class="pi pi-chart-bar mr-3 text-lg" [ngClass]="{'text-[#f05435]': true}"></i>
+      <!-- Panel Principal -->
+      <li *ngIf="isAdmin" class="px-3 mb-2">
+        <a routerLink="/dashboard" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+           class="flex items-center px-4 py-3 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+          <i class="pi pi-objects-column mr-3 text-lg opacity-70 group-hover:opacity-100 group-[.active]:text-verde-esmeralda transition-opacity"></i>
           Panel Principal
         </a>
       </li>
 
-      <!-- Recepción y Transaccional (Recepcionista y Admin) -->
+      <!-- Módulo: Recepción -->
       <ng-container *ngIf="isRecepcion">
-        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-          Recepción
+        <li class="pt-4 pb-2 px-7 text-[10px] font-bold text-blue-300 uppercase tracking-widest opacity-80">
+          Admisión & Ventas
         </li>
-        <li>
-          <a routerLink="/pacientes" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-users mr-3 text-lg transition-colors group-hover:text-[#f05435]"></i>
-            Pacientes
+        <li class="px-3">
+          <a routerLink="/pacientes" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-users mr-3 text-lg opacity-70 group-hover:opacity-100"></i>
+            Directorio Pacientes
           </a>
         </li>
-        <li>
-          <a routerLink="/transaccional" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-shopping-cart mr-3 text-lg"></i>
+        <li class="px-3">
+          <a routerLink="/transaccional" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-receipt mr-3 text-lg opacity-70 group-hover:opacity-100"></i>
             Nueva Orden
           </a>
         </li>
       </ng-container>
 
-      <!-- Tópico y Logística -->
+      <!-- Módulo: Tópico -->
       <ng-container *ngIf="isRecepcion || isBiologo">
-        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-          Tópico
+        <li class="pt-5 pb-2 px-7 text-[10px] font-bold text-blue-300 uppercase tracking-widest opacity-80">
+          Logística Clínica
         </li>
-        <li>
-          <a routerLink="/topico" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-check-square mr-3 text-lg"></i>
-            Toma de Muestras
+        <li class="px-3">
+          <a routerLink="/topico" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-box mr-3 text-lg opacity-70 group-hover:opacity-100"></i>
+            Tópico & Muestras
           </a>
         </li>
       </ng-container>
 
-      <!-- Laboratorio y Resultados -->
+      <!-- Módulo: Laboratorio -->
       <ng-container *ngIf="isBiologo">
-        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-          Laboratorio
+        <li class="pt-5 pb-2 px-7 text-[10px] font-bold text-blue-300 uppercase tracking-widest opacity-80">
+          Laboratorio Central
         </li>
-        <li>
-          <a routerLink="/resultados" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-microchip mr-3 text-lg"></i>
-            Resultados Clínicos
+        <li class="px-3">
+          <a routerLink="/resultados" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-microchip mr-3 text-lg opacity-70 group-hover:opacity-100 text-purple-400"></i>
+            Análisis y Resultados
           </a>
         </li>
       </ng-container>
 
-      <!-- Administración Pura -->
+      <!-- Módulo: Configuración -->
       <ng-container *ngIf="isAdmin">
-        <li class="pt-6 pb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
-          Administración
+        <li class="pt-5 pb-2 px-7 text-[10px] font-bold text-blue-300 uppercase tracking-widest opacity-80">
+          Configuración
         </li>
-        <li>
-          <a routerLink="/inventario" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-box mr-3 text-lg"></i>
-            Inventario Logístico
+        <li class="px-3">
+          <a routerLink="/inventario" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-database mr-3 text-lg opacity-70 group-hover:opacity-100"></i>
+            Stock Logístico
           </a>
         </li>
-        <li>
-          <a routerLink="/catalogo" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-book mr-3 text-lg"></i>
-            Catálogo Exámenes
+        <li class="px-3">
+          <a routerLink="/catalogo" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-book mr-3 text-lg opacity-70 group-hover:opacity-100"></i>
+            Catálogo Clínico
           </a>
         </li>
-        <li>
-          <a routerLink="/personal" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-id-card mr-3 text-lg"></i>
+        <li class="px-3">
+          <a routerLink="/personal" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-id-card mr-3 text-lg opacity-70 group-hover:opacity-100"></i>
             Gestión Personal
           </a>
         </li>
-        <li>
-          <a routerLink="/caja" 
-             routerLinkActive="bg-white/5 border-l-[#f05435] text-white"
-             class="flex items-center px-4 py-3 rounded-r-lg border-l-4 border-transparent hover:bg-white/5 hover:text-white transition-all cursor-pointer text-sm font-medium">
-            <i class="pi pi-wallet mr-3 text-lg"></i>
-            Cierre de Caja 
+        <li class="px-3 mt-1">
+          <a routerLink="/caja" routerLinkActive="bg-white/10 border-verde-esmeralda text-white" 
+             class="flex items-center px-4 py-2.5 rounded-xl border-l-4 border-transparent text-blue-100 hover:bg-white/5 hover:text-white transition-all cursor-pointer font-medium text-sm group">
+            <i class="pi pi-calculator mr-3 text-lg opacity-70 group-hover:opacity-100 text-yellow-400"></i>
+            Cierre de Caja
           </a>
         </li>
       </ng-container>
 
     </ul>
   </nav>
+
+  <!-- Tarjeta de Perfil de Usuario y Logout (Abajo del todo) -->
+  <div class="p-4 border-t border-white/10 shrink-0 bg-black/10">
+    <div class="bg-white/5 rounded-2xl p-3 flex items-center justify-between border border-white/10">
+      <div class="flex items-center space-x-3 overflow-hidden">
+        <!-- Avatar -->
+        <div class="h-9 w-9 rounded-full bg-gradient-to-br from-blue-400 to-azul-clinico flex items-center justify-center font-bold text-sm shadow-inner shrink-0">
+          {{ nombreCorto.charAt(0) | uppercase }}
+        </div>
+        <!-- Info Usuario -->
+        <div class="overflow-hidden">
+          <p class="text-sm font-bold text-white truncate" [title]="correoActual">{{ nombreCorto | titlecase }}</p>
+          <p class="text-[10px] text-verde-esmeralda font-semibold tracking-wider uppercase">{{ nombreRolMostrar }}</p>
+        </div>
+      </div>
+      <!-- Botón de Salir -->
+      <button (click)="cerrarSesion()" title="Cerrar Sesión" 
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-blue-200 hover:bg-rojo-alerta/20 hover:text-rojo-alerta transition-colors shrink-0">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </div>
+
 </aside>

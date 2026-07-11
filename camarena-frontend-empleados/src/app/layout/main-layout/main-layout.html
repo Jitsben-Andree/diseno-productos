@@ -1,27 +1,21 @@
-<!-- Hatun kancha (Contenedor principal Premium Dark) -->
-<div class="flex h-screen w-full bg-[#070708] overflow-hidden relative font-sans text-gray-300">
+<div class="flex h-screen w-full bg-gris-fondo overflow-hidden">
+  
+  <!-- Overlay oscuro para móvil cuando el sidebar está abierto -->
+  <div *ngIf="sidebarService.isOpen$ | async" 
+       (click)="sidebarService.close()"
+       class="lg:hidden fixed inset-0 bg-black/50 z-20 transition-opacity"></div>
 
-  <!-- Luces ambientales de fondo (Ambient Glow) para mantener la identidad del Login -->
-  <div class="absolute top-[-15%] left-[-5%] w-[500px] h-[500px] bg-[#f05435] rounded-full mix-blend-screen filter blur-[130px] opacity-20 pointer-events-none animate-pulse"></div>
-  <div class="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] bg-orange-600 rounded-full mix-blend-screen filter blur-[150px] opacity-10 pointer-events-none"></div>
+  <!-- Sidebar: Fijo en escritorio, Overlay en móvil -->
+  <div [class]="(sidebarService.isOpen$ | async) ? 'fixed inset-y-0 left-0 z-30 translate-x-0' : '-translate-x-full lg:translate-x-0'"
+       class="fixed lg:relative transition-transform duration-300 ease-in-out h-full shadow-2xl">
+    <app-sidebar></app-sidebar>
+  </div>
 
-  <!-- Sidebar Componente (Con z-index para estar sobre los brillos) -->
-  <app-sidebar class="z-20 shadow-2xl shadow-black/50"></app-sidebar>
-
-  <!-- Paña law kancha (Área derecha que contiene el Topbar y el Contenido) -->
-  <div class="flex flex-col flex-1 overflow-hidden relative z-10">
-    
-    <!-- Topbar Componente -->
+  <!-- Contenido Principal -->
+  <div class="flex flex-col flex-1 overflow-hidden">
     <app-topbar></app-topbar>
-
-    <!-- Ukhu kancha (Área de contenido principal) -->
-    <!-- Se le añade un scrollbar personalizado invisible/elegante -->
-    <main class="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth">
-      <div class="max-w-7xl mx-auto">
-        <!-- Kaypi wak componentekuna rikurimunqa -->
-        <router-outlet></router-outlet>
-      </div>
+    <main class="flex-1 overflow-y-auto p-4 md:p-6">
+      <router-outlet></router-outlet>
     </main>
-
   </div>
 </div>

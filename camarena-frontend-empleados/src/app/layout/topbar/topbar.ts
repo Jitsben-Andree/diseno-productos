@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../core/services/auth';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth';
+import { SidebarService } from '../../core/services/sidebar';
 
 @Component({
   selector: 'app-topbar',
@@ -10,9 +11,9 @@ import { CommonModule } from '@angular/common';
   templateUrl: './topbar.html'
 })
 export class TopbarComponent {
-
   private authService = inject(AuthService);
   private router = inject(Router);
+  sidebarService = inject(SidebarService); // Inyectamos el servicio
 
   lluqsiy() {
     this.authService.cerrarSesion();

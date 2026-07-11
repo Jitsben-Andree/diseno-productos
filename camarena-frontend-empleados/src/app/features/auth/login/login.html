@@ -1,154 +1,137 @@
-<div class="login-wrapper min-h-screen w-full flex items-center justify-center p-4 overflow-hidden relative">
+<div class="min-h-screen flex items-center justify-center bg-gris-fondo relative overflow-hidden font-sans">
   
-  <!-- Círculos de luz ambiental (Glow effects configurados en SCSS) -->
-  <div class="absolute glow-circle-1"></div>
-  <div class="absolute glow-circle-2"></div>
-  <div class="absolute glow-circle-3"></div>
+  <!-- Decoración de fondo clínica abstracta (Opcional, le da un toque moderno) -->
+  <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-azul-clinico rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-verde-esmeralda rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
 
-  <!-- Contenedor Principal (2 Columnas en pantallas grandes) -->
-  <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+  <!-- Contenedor Principal (Tarjeta Glassmorphism) -->
+  <div class="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-8 sm:p-10 relative z-10 border border-white">
     
-    <!-- COLUMNA IZQUIERDA: Ilustración Line-Art Minimalista -->
-    <div class="hidden lg:flex lg:col-span-6 flex-col justify-center items-center text-left p-6">
-      <div class="relative w-full max-w-md">
-        
-        <!-- Blobs decorativos de fondo similares a las nubes naranjas de la referencia -->
-        <div class="absolute w-40 h-40 bg-[#f05435] opacity-20 rounded-full blur-3xl -top-10 -left-10 animate-pulse"></div>
-        <div class="absolute w-32 h-32 bg-orange-400 opacity-25 rounded-full blur-2xl bottom-10 right-10"></div>
-        
-        <!-- Ilustración Premium SVG de Personaje trabajando/relajado -->
-        <svg viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full drop-shadow-2xl">
-          <!-- Silla de descanso -->
-          <path d="M120 320 L180 180 L280 200 L320 320" stroke="white" stroke-width="3" stroke-linecap="round"/>
-          <path d="M180 180 L100 240 L180 320" stroke="white" stroke-width="3" stroke-linecap="round"/>
-          <!-- Soporte de Silla -->
-          <line x1="160" y1="280" x2="120" y2="350" stroke="white" stroke-width="3" stroke-linecap="round"/>
-          <line x1="240" y1="290" x2="280" y2="350" stroke="white" stroke-width="3" stroke-linecap="round"/>
-          
-          <!-- Nubes/Blobs de color naranja suave (Acentos estéticos del dibujo) -->
-          <path d="M80 300 C60 300 50 280 65 265 C55 250 70 230 90 240 C100 230 120 240 115 255 C125 270 110 300 80 300 Z" fill="#f05435" fill-opacity="0.8"/>
-          <path d="M380 240 C365 240 355 225 365 210 C355 195 370 180 385 190 C395 180 410 190 405 205 C415 215 405 240 380 240 Z" fill="#f05435" fill-opacity="0.8"/>
+    <!-- Encabezado con Logo UI -->
+    <div class="text-center mb-8">
+      <div class="mx-auto w-16 h-16 bg-azul-clinico/10 rounded-2xl flex items-center justify-center mb-4 border border-azul-clinico/20 shadow-sm">
+        <i class="pi pi-shield text-3xl text-azul-clinico"></i>
+      </div>
+      <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">Camarena <span class="text-azul-clinico">Digital</span></h2>
+      <p class="text-sm text-gray-500 mt-2 font-medium">ERP Administrativo & Clínico</p>
+    </div>
 
-          <!-- Cuerpo del Personaje en descanso -->
-          <path d="M140 200 C150 160 190 140 210 170 L250 220 L350 260 L330 310 L240 270 L190 280 Z" stroke="white" stroke-width="4" stroke-linejoin="round"/>
-          <!-- Cabeza -->
-          <circle cx="190" cy="130" r="25" stroke="white" stroke-width="4"/>
-          <!-- Lentes de Sol (Detalle cool de la referencia) -->
-          <path d="M175 130 Q190 125 205 130" stroke="white" stroke-width="3"/>
-          <path d="M175 130 H185 L180 138 Z" fill="white"/>
-          <path d="M193 130 H203 L198 138 Z" fill="white"/>
-          <!-- Laptop en las piernas -->
-          <path d="M220 210 L270 200 L290 160" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          <line x1="220" y1="210" x2="270" y2="200" stroke="#f05435" stroke-width="4"/>
-          
-          <!-- Bebida/Vaso al costado -->
-          <path d="M310 180 L330 180 L325 220 L315 220 Z" stroke="white" stroke-width="3"/>
-          <!-- Rodaja de limón decorativa -->
-          <circle cx="335" cy="175" r="10" stroke="#f05435" stroke-width="2"/>
-          <line x1="335" y1="165" x2="335" y2="185" stroke="#f05435" stroke-width="1.5"/>
-          <line x1="325" y1="175" x2="345" y2="175" stroke="#f05435" stroke-width="1.5"/>
-        </svg>
+    <!-- Alerta de Error Dinámica -->
+    <div *ngIf="mensajeError" class="mb-6 p-4 bg-rojo-alerta/10 border-l-4 border-rojo-alerta text-rojo-alerta rounded-r-lg text-sm flex items-start animate-fadeIn">
+      <i class="pi pi-exclamation-triangle mt-0.5 mr-2"></i>
+      <span class="font-medium">{{ mensajeError }}</span>
+    </div>
 
-        <!-- Mensajes debajo de la ilustración -->
-        <div class="mt-8 text-left">
-          <h2 class="text-3xl font-extrabold text-white tracking-wide">Laboratorio Camarena</h2>
-          <p class="text-gray-400 mt-2 text-sm max-w-sm leading-relaxed">
-            Gestione sus tareas analíticas con mayor rapidez utilizando herramientas de automatización de última generación.
-          </p>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      
+      <!-- Campo Correo Electrónico -->
+      <div>
+        <label class="block text-sm font-bold text-gray-700 mb-1.5">Correo Corporativo</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <i class="pi pi-envelope text-gray-400"></i>
+          </div>
+          <input 
+            type="email" 
+            formControlName="email"
+            class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-azul-clinico focus:border-transparent transition-all bg-gray-50/50 focus:bg-white"
+            placeholder="usuario@camarena.com"
+            [ngClass]="{'border-rojo-alerta focus:ring-rojo-alerta bg-red-50/50': f['email'].invalid && f['email'].touched}"
+          >
         </div>
+        <div *ngIf="f['email'].invalid && f['email'].touched" class="text-rojo-alerta text-xs mt-1.5 font-medium flex items-center">
+          <i class="pi pi-info-circle mr-1"></i> Ingrese un formato de correo válido.
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div>
+        <div class="flex justify-between items-center mb-1.5">
+          <label class="block text-sm font-bold text-gray-700">Contraseña de Acceso</label>
+          <a href="#" class="text-xs font-bold text-azul-clinico hover:text-azul-clinico-light transition-colors">¿Olvidó su clave?</a>
+        </div>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <i class="pi pi-lock text-gray-400"></i>
+          </div>
+          <input 
+            [type]="mostrarContrasena ? 'text' : 'password'" 
+            formControlName="contrasena"
+            class="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-azul-clinico focus:border-transparent transition-all bg-gray-50/50 focus:bg-white"
+            placeholder="••••••••"
+            [ngClass]="{'border-rojo-alerta focus:ring-rojo-alerta bg-red-50/50': f['contrasena'].invalid && f['contrasena'].touched}"
+          >
+          <!-- Botón Ojo (Mostrar/Ocultar) -->
+          <button 
+            type="button" 
+            (click)="toggleMostrarContrasena()" 
+            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-azul-clinico transition-colors focus:outline-none"
+            title="Mostrar/Ocultar contraseña"
+          >
+            <i class="pi text-lg" [ngClass]="mostrarContrasena ? 'pi-eye-slash' : 'pi-eye'"></i>
+          </button>
+        </div>
+        <div *ngIf="f['contrasena'].invalid && f['contrasena'].touched" class="text-rojo-alerta text-xs mt-1.5 font-medium flex items-center">
+          <i class="pi pi-info-circle mr-1"></i> La contraseña es obligatoria (mín. 4 caracteres).
+        </div>
+      </div>
+
+      <!-- Checkbox Recordarme -->
+      <div class="flex items-center mt-2">
+        <div class="flex items-center h-5">
+          <input 
+            type="checkbox" 
+            formControlName="recordarme"
+            id="recordarme"
+            class="w-4 h-4 text-azul-clinico border-gray-300 rounded focus:ring-azul-clinico cursor-pointer"
+          >
+        </div>
+        <div class="ml-2">
+          <label for="recordarme" class="text-sm font-medium text-gray-600 cursor-pointer select-none">
+            Mantener sesión iniciada
+          </label>
+        </div>
+      </div>
+
+      <!-- Botón de Submit (Ingreso) -->
+      <button 
+        type="submit" 
+        [disabled]="loginForm.invalid || cargando"
+        class="w-full bg-azul-clinico hover:bg-azul-clinico-light text-white font-bold py-3.5 px-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed flex justify-center items-center transition-all shadow-lg shadow-azul-clinico/20 active:scale-[0.98] mt-2"
+      >
+        <span *ngIf="!cargando" class="flex items-center"><i class="pi pi-sign-in mr-2"></i> Ingresar al Sistema</span>
+        <span *ngIf="cargando" class="flex items-center"><i class="pi pi-spinner pi-spin mr-2"></i> Validando credenciales...</span>
+      </button>
+
+    </form>
+
+    <!-- Separador SSO (Redes Sociales/Institucionales) -->
+    <div class="mt-8 relative">
+      <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-gray-200"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-3 bg-white text-gray-500 font-medium">O ingresa mediante</span>
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA: Tarjeta de Login (Glassmorphism de alta fidelidad) -->
-    <div class="col-span-1 lg:col-span-6 flex justify-center">
-      <div class="w-full max-w-md login-card p-8 rounded-3xl border border-white/10 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-        
-        <!-- Encabezado del Formulario -->
-        <div class="mb-8 text-left">
-          <h1 class="text-3xl font-extrabold text-white tracking-tight">Welcome back!</h1>
-          <p class="text-gray-400 text-xs mt-2 font-medium">
-            Acceda de forma segura al panel administrativo del laboratorio.
-          </p>
-        </div>
-
-        <!-- Alerta de Error (Dinámica) -->
-        <div *ngIf="mensajeError" class="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs text-center font-medium animate-fadeIn">
-          <i class="pi pi-exclamation-circle mr-1"></i> {{ mensajeError }}
-        </div>
-
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-          
-          <!-- Campo Email -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">Email*</label>
-            <div class="relative">
-              <input 
-                type="email" 
-                formControlName="email"
-                class="w-full px-4 py-3 bg-white text-gray-900 font-medium rounded-xl outline-none focus:ring-4 focus:ring-[#f05435]/30 transition-all placeholder-gray-400 text-sm border-0"
-                placeholder="email@example.com"
-                [ngClass]="{'ring-2 ring-red-500/50': f['email'].invalid && f['email'].touched}"
-              >
-            </div>
-            <!-- Validación UX -->
-            <div *ngIf="f['email'].invalid && f['email'].touched" class="text-red-400 text-xs mt-1 font-medium pl-1">
-              Ingrese una dirección de correo válida.
-            </div>
-          </div>
-
-          <!-- Campo Contraseña -->
-          <div class="space-y-1.5">
-            <div class="flex justify-between items-center">
-              <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">Password*</label>
-            </div>
-            <div class="relative">
-              <input 
-                [type]="mostrarContrasena ? 'text' : 'password'" 
-                formControlName="contrasena"
-                class="w-full px-4 py-3 bg-white text-gray-900 font-medium rounded-xl outline-none focus:ring-4 focus:ring-[#f05435]/30 transition-all placeholder-gray-400 text-sm border-0"
-                placeholder="Ingrese su contraseña"
-                [ngClass]="{'ring-2 ring-red-500/50': f['contrasena'].invalid && f['contrasena'].touched}"
-              >
-              <!-- Botón interno de mostrar/ocultar contraseña -->
-              <button 
-                type="button" 
-                (click)="toggleMostrarContrasena()"
-                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 transition-colors">
-                <i class="pi text-lg" [ngClass]="mostrarContrasena ? 'pi-eye-slash' : 'pi-eye'"></i>
-              </button>
-            </div>
-            <div *ngIf="f['contrasena'].invalid && f['contrasena'].touched" class="text-red-400 text-xs mt-1 font-medium pl-1">
-              La contraseña es obligatoria (mínimo 4 caracteres).
-            </div>
-          </div>
-
-          <br>
-
-          <!-- Botón de Envío principal -->
-          <div class="pt-2">
-            <button 
-              type="submit" 
-              [disabled]="loginForm.invalid || cargando"
-              class="w-full bg-[#f05435] hover:bg-[#d94426] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-orange-950/20 disabled:opacity-40 flex justify-center items-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm"
-            >
-              <span *ngIf="!cargando">Log in</span>
-              <span *ngIf="cargando" class="flex items-center gap-2">
-                <i class="pi pi-spin pi-spinner"></i> Autenticando...
-              </span>
-            </button>
-          </div>
-
-          <!-- Separador "Or Login with" -->
-          <div class="relative my-6 flex items-center justify-center">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-white/10"></div>
-            </div>
-            <span class="relative px-3 bg-[#111] text-[11px] text-gray-500 uppercase tracking-widest font-semibold">Or Login with</span>
-          </div>
-
-        </form>
-      </div>
+    <!-- Botones de SSO -->
+    <div class="mt-6 grid grid-cols-2 gap-4">
+      <button (click)="loginConSocial('Microsoft')" type="button" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors active:scale-95">
+        <i class="pi pi-microsoft text-blue-600 mr-2 text-lg"></i>
+        Microsoft
+      </button>
+      <button (click)="loginConSocial('Google')" type="button" class="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors active:scale-95">
+        <i class="pi pi-google text-red-500 mr-2 text-lg"></i>
+        Google
+      </button>
     </div>
 
   </div>
+  
+  <!-- Pie de página corporativo -->
+  <div class="absolute bottom-5 w-full text-center z-10">
+    <p class="text-xs text-gray-500 font-semibold">© 2026 Laboratorio Clínico Camarena Padilla. Todos los derechos reservados.</p>
+  </div>
+
 </div>

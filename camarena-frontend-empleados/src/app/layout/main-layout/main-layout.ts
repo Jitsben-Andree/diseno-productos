@@ -1,14 +1,16 @@
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { TopbarComponent } from '../topbar/topbar';
+import { SidebarService } from '../../core/services/sidebar';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
   imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
-  templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss', // Si tienes estilos extra, van aquí
+  templateUrl: './main-layout.html'
 })
-export class MainLayoutComponent {}
+export class MainLayoutComponent {
+  sidebarService = inject(SidebarService);
+}

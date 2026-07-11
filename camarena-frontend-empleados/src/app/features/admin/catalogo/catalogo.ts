@@ -44,7 +44,7 @@ export class CatalogoComponent implements OnInit {
       unidad: [''],
       valorMin: [0, Validators.required],
       valorMax: [0, Validators.required],
-      sexoAplica: ['A', Validators.required] // 'A' = Ambos sexos
+      sexoAplica: ['A', Validators.required] 
     });
   }
 

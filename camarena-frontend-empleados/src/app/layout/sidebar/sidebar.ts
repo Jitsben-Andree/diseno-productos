@@ -12,6 +12,7 @@ export class SidebarComponent implements OnInit {
   private router = inject(Router);
 
   correoActual: string = 'Usuario';
+  nombreCorto: string = 'Usuario'; // Añadido para la UX
   rolActual: string = '';
 
   ngOnInit() {
@@ -25,15 +26,27 @@ export class SidebarComponent implements OnInit {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.correoActual = payload.sub || payload.email || 'Usuario';
+        
+        // UX: Extraer solo la parte antes del @ para un saludo más amigable
+        this.nombreCorto = this.correoActual.split('@')[0];
       } catch (e) {
         console.error('Error al decodificar token', e);
       }
     }
   }
 
+  // Reglas de Permisos
   get isAdmin(): boolean { return this.rolActual.includes('ROLE_ADMIN'); }
   get isRecepcion(): boolean { return this.rolActual.includes('ROLE_RECEPCION') || this.isAdmin; }
   get isBiologo(): boolean { return this.rolActual.includes('ROLE_BIOLOGO') || this.isAdmin; }
+
+  // Nombre amigable del Rol para la Interfaz
+  get nombreRolMostrar(): string {
+    if (this.isAdmin) return 'Administrador';
+    if (this.rolActual.includes('ROLE_BIOLOGO')) return 'Biólogo/Médico';
+    if (this.rolActual.includes('ROLE_RECEPCION')) return 'Recepción';
+    return 'Staff';
+  }
 
   cerrarSesion() {
     localStorage.removeItem('jwt_camarena'); 
