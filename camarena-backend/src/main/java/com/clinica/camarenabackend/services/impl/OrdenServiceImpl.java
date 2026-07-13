@@ -110,7 +110,6 @@ public class OrdenServiceImpl implements OrdenService {
         ordenRepository.save(orden);
     }
 
-    // NUEVO: Implementación del método para el Kanban
     @Override
     public List<OrdenResponse> listarPendientesTopico() {
         // Buscamos todas las órdenes que el recepcionista ya cobró
@@ -123,5 +122,48 @@ public class OrdenServiceImpl implements OrdenService {
                 .fechaEmision(orden.getOfechaEmision())
                 .estadoGeneral(orden.getOestadoGeneral())
                 .build()).collect(Collectors.toList());
+    }
+
+    // =================================================================================
+    // NUEVOS MÉTODOS PARA EL HISTORIAL Y ANULACIONES
+    // =================================================================================
+
+    @Override
+    public List<OrdenResponse> buscarHistorial(String filtro) {
+        // Llama a la consulta omnicanal que creamos en el repositorio
+        List<OrdenLaboratorio> ordenes = ordenRepository.buscarHistorial(filtro);
+
+        return ordenes.stream().map(orden -> {
+            // Calculamos el total de la orden sumando el precio cobrado de cada detalle
+            BigDecimal total = detalleOrdenRepository.findByOrden_Oid_orden(orden.getOid_orden()).stream()
+                    .map(DetalleOrden::getOprecioCobrado)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            return OrdenResponse.builder()
+                    .idOrden(orden.getOid_orden())
+                    .nombrePaciente(orden.getPaciente().getOnombres() + " " + orden.getPaciente().getOapellidos())
+                    .codigoTicket(orden.getOcodigoTicket())
+                    .fechaEmision(orden.getOfechaEmision())
+                    .estadoGeneral(orden.getOestadoGeneral())
+                    .montoTotalCalculado(total)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional // Crítico porque modifica el estado en BD
+    public void anularOrden(UUID idOrden, String motivo) {
+        OrdenLaboratorio orden = ordenRepository.findById(idOrden)
+                .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
+
+        // Regla de Seguridad Médica y Contable
+        if (orden.getOestadoGeneral().equals("FINALIZADO") || orden.getOestadoGeneral().equals("ANULADO")) {
+            throw new RuntimeException("No se puede anular esta orden en su estado actual.");
+        }
+
+        orden.setOestadoGeneral("ANULADO");
+        ordenRepository.save(orden);
+
+        // Opcional a futuro: Aquí podríamos guardar el motivo en una tabla de auditoría contable
     }
 }

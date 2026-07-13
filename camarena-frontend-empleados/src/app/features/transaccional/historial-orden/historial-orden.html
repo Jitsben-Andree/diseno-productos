@@ -1,0 +1,195 @@
+<div class="p-6 bg-gray-50 min-h-screen relative font-sans animate-fadeIn">
+
+  <div *ngIf="notificacion" 
+       class="fixed top-6 right-6 z-[9999] px-5 py-4 rounded-xl backdrop-blur-md border shadow-2xl flex items-center gap-3 transition-all transform duration-300"
+       [ngClass]="{
+         'bg-emerald-50 border-emerald-200 text-emerald-700': notificacion.tipo === 'exito',
+         'bg-red-50 border-red-200 text-red-700': notificacion.tipo === 'error',
+         'bg-yellow-50 border-yellow-200 text-yellow-700': notificacion.tipo === 'advertencia'
+       }">
+    <i class="pi text-xl" 
+       [ngClass]="{
+         'pi-check-circle': notificacion.tipo === 'exito',
+         'pi-exclamation-circle': notificacion.tipo === 'error',
+         'pi-exclamation-triangle': notificacion.tipo === 'advertencia'
+       }"></i>
+    <span class="font-bold text-sm">{{ notificacion.mensaje }}</span>
+  </div>
+
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight">Control de Tickets</h1>
+      <p class="text-gray-500 text-sm mt-1 font-medium">Búsqueda omnicanal, seguimiento visual de órdenes y reimpresiones.</p>
+    </div>
+  </div>
+
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row items-center gap-4">
+    <div class="relative w-full md:w-2/3">
+      <i class="pi pi-search absolute left-4 top-4 text-gray-400 text-lg"></i>
+      <input type="text" [(ngModel)]="terminoBusqueda" (keyup.enter)="buscar()" 
+             placeholder="Buscar por DNI del paciente o Nro. de Ticket (Ej. TKT-ABC12)..." 
+             class="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium bg-gray-50 focus:bg-white transition-all text-gray-700">
+    </div>
+    <button (click)="buscar()" [disabled]="buscando" 
+            class="w-full md:w-1/3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center">
+      <span *ngIf="!buscando"><i class="pi pi-search mr-2"></i> Rastrear Orden</span>
+      <span *ngIf="buscando"><i class="pi pi-spinner pi-spin mr-2"></i> Buscando en BD...</span>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 overflow-hidden" *ngIf="ordenes.length > 0">
+    <p-table [value]="ordenes" [paginator]="true" [rows]="10" styleClass="p-datatable-sm" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr class="bg-gray-50/50">
+          <th class="text-left text-gray-500 text-xs font-black uppercase tracking-wider p-4 border-b border-gray-100">Ticket</th>
+          <th class="text-left text-gray-500 text-xs font-black uppercase tracking-wider p-4 border-b border-gray-100">Paciente</th>
+          <th class="text-left text-gray-500 text-xs font-black uppercase tracking-wider p-4 border-b border-gray-100">Fecha</th>
+          <th class="text-left text-gray-500 text-xs font-black uppercase tracking-wider p-4 border-b border-gray-100">Monto</th>
+          <th class="text-center text-gray-500 text-xs font-black uppercase tracking-wider p-4 border-b border-gray-100">Estado Actual</th>
+          <th class="text-center text-gray-500 text-xs font-black uppercase tracking-wider p-4 border-b border-gray-100">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-orden>
+        <tr class="hover:bg-blue-50/30 transition-colors border-b border-gray-50 group">
+          <td class="p-4 font-mono font-bold text-blue-600 text-sm">{{ orden.codigoTicket }}</td>
+          <td class="p-4 font-bold text-gray-800 text-sm">{{ orden.nombrePaciente }}</td>
+          <td class="p-4 text-gray-600 text-sm">{{ orden.fechaEmision | date:'short' }}</td>
+          <td class="p-4 font-bold text-emerald-600 text-sm">S/ {{ orden.montoTotalCalculado | number:'1.2-2' }}</td>
+          <td class="p-4 text-center">
+            <span class="px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border"
+                  [ngClass]="{
+                    'bg-yellow-50 text-yellow-700 border-yellow-200': orden.estadoGeneral === 'EN_ESPERA_MUESTRA',
+                    'bg-blue-50 text-blue-700 border-blue-200': orden.estadoGeneral === 'EN_PROCESO' || orden.estadoGeneral === 'MUESTRAS_TOMADAS',
+                    'bg-emerald-50 text-emerald-700 border-emerald-200': orden.estadoGeneral === 'FINALIZADO',
+                    'bg-red-50 text-red-700 border-red-200': orden.estadoGeneral === 'ANULADO'
+                  }">
+              {{ orden.estadoGeneral.replace('_', ' ') }}
+            </span>
+          </td>
+          <td class="p-4 text-center">
+            <button (click)="verTracking(orden)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg text-xs transition-colors border border-gray-200">
+              <i class="pi pi-eye mr-1"></i> Ver Tracking
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div *ngIf="ordenes.length === 0 && !buscando" class="text-center py-20 text-gray-400 bg-white rounded-2xl border border-gray-100 shadow-sm mt-6">
+    <i class="pi pi-inbox text-5xl mb-3 opacity-30"></i>
+    <p class="font-bold">Realice una búsqueda para ver el historial.</p>
+  </div>
+
+  <p-dialog [(visible)]="mostrarModalTracking" [modal]="true" [style]="{ width: '600px' }" [draggable]="false" [resizable]="false" styleClass="rounded-2xl overflow-hidden shadow-2xl border-0">
+    <ng-template pTemplate="header">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+          <i class="pi pi-ticket"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-900 leading-tight">Detalle Operativo</h2>
+          <p class="text-xs text-gray-500 font-mono">Ticket: {{ ordenSeleccionada?.codigoTicket }}</p>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="p-2" *ngIf="ordenSeleccionada">
+      <!-- Línea de Tiempo (Progress Tracking) -->
+      <div class="mb-8 mt-2 px-4">
+        <p class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Tracking del Paciente</p>
+        <div class="relative flex justify-between items-center w-full">
+          <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 rounded-full z-0"></div>
+          
+          <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-blue-500 rounded-full z-0 transition-all duration-500"
+               [style.width]="ordenSeleccionada?.estadoGeneral === 'ANULADO' ? '100%' : (obtenerNivelTracking(ordenSeleccionada?.estadoGeneral) * 33.33) + '%'"
+               [ngClass]="{'bg-red-500': ordenSeleccionada?.estadoGeneral === 'ANULADO', 'bg-emerald-500': ordenSeleccionada?.estadoGeneral === 'FINALIZADO'}"></div>
+
+          <!-- Step 1 -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors duration-300"
+                 [ngClass]="obtenerNivelTracking(ordenSeleccionada?.estadoGeneral) >= 0 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-400 border-gray-300'">
+              1
+            </div>
+            <span class="text-[10px] font-bold mt-2 uppercase tracking-wide text-gray-600">Recepción</span>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors duration-300"
+                 [ngClass]="obtenerNivelTracking(ordenSeleccionada?.estadoGeneral) >= 1 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-400 border-gray-300'">
+              2
+            </div>
+            <span class="text-[10px] font-bold mt-2 uppercase tracking-wide text-gray-600">Tópico</span>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors duration-300"
+                 [ngClass]="obtenerNivelTracking(ordenSeleccionada?.estadoGeneral) >= 2 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-400 border-gray-300'">
+              3
+            </div>
+            <span class="text-[10px] font-bold mt-2 uppercase tracking-wide text-gray-600">Laboratorio</span>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="relative z-10 flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors duration-300"
+                 [ngClass]="{'bg-emerald-600 text-white border-emerald-600': ordenSeleccionada?.estadoGeneral === 'FINALIZADO', 'bg-red-600 text-white border-red-600': ordenSeleccionada?.estadoGeneral === 'ANULADO', 'bg-white text-gray-400 border-gray-300': ordenSeleccionada?.estadoGeneral !== 'FINALIZADO' && ordenSeleccionada?.estadoGeneral !== 'ANULADO'}">
+              <i class="pi" [ngClass]="ordenSeleccionada?.estadoGeneral === 'ANULADO' ? 'pi-times' : 'pi-check'"></i>
+            </div>
+            <span class="text-[10px] font-bold mt-2 uppercase tracking-wide" [ngClass]="ordenSeleccionada?.estadoGeneral === 'ANULADO' ? 'text-red-600' : 'text-gray-600'">
+              {{ ordenSeleccionada?.estadoGeneral === 'ANULADO' ? 'Anulado' : 'Entrega' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3 pt-5 border-t border-gray-100 mt-4">
+        
+        <!-- Botón de Resultados Clínicos PDF (Aparece cuando el Biólogo aprueba) -->
+        <button *ngIf="ordenSeleccionada?.estadoGeneral === 'FINALIZADO'"
+                (click)="imprimirResultados(ordenSeleccionada)" 
+                class="w-full py-4 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 rounded-xl font-bold text-sm transition-colors flex justify-center items-center shadow-sm">
+          <i class="pi pi-file-pdf mr-2 text-lg"></i> Imprimir Informe Médico (A4)
+        </button>
+
+        <div class="flex gap-3">
+          <!--
+          <button (click)="reimprimirVoucher(ordenSeleccionada)" 
+                  class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-xs transition-colors border border-gray-200 flex justify-center items-center">
+            <i class="pi pi-print mr-2"></i> Copia de Ticket
+          </button> -->
+          
+          <!-- Botón Peligro: Oculto si está finalizado o anulado -->
+          <button *ngIf="ordenSeleccionada?.estadoGeneral !== 'FINALIZADO' && ordenSeleccionada?.estadoGeneral !== 'ANULADO'"
+                  (click)="iniciarAnulacion(ordenSeleccionada)" 
+                  class="flex-1 py-3 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl font-bold text-xs transition-colors flex justify-center items-center">
+            <i class="pi pi-exclamation-triangle mr-2"></i> Anular y Extornar
+          </button>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog [(visible)]="mostrarModalAnular" [modal]="true" header="Confirmar Anulación y Extorno" [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
+    <div class="mt-4">
+      <div class="p-3 bg-red-50 text-red-700 rounded-lg text-sm border border-red-100 mb-4 flex items-start">
+        <i class="pi pi-info-circle mr-2 mt-0.5"></i>
+        <span>Está a punto de anular el ticket <strong>{{ ordenSeleccionada?.codigoTicket }}</strong>. El dinero deberá ser devuelto al paciente en caja.</span>
+      </div>
+      
+      <label class="block text-sm font-bold text-gray-700 mb-2">Motivo de la anulación (Obligatorio para auditoría):</label>
+      <textarea [(ngModel)]="motivoAnulacion" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm" placeholder="Ej. El paciente decidió no realizarse la prueba porque no estaba en ayunas..."></textarea>
+      
+      <div class="flex justify-end gap-3 mt-6">
+        <button (click)="mostrarModalAnular = false" class="px-5 py-2.5 text-gray-600 font-bold bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm">Cancelar</button>
+        <button (click)="confirmarAnulacion()" [disabled]="procesandoAnulacion || motivoAnulacion.trim().length < 10" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors shadow-md disabled:opacity-50 text-sm flex items-center">
+          <span *ngIf="!procesandoAnulacion"><i class="pi pi-trash mr-2"></i> Confirmar Anulación</span>
+          <span *ngIf="procesandoAnulacion"><i class="pi pi-spinner pi-spin mr-2"></i> Procesando...</span>
+        </button>
+      </div>
+    </div>
+  </p-dialog>
+
+</div>

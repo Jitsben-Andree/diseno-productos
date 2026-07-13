@@ -1,422 +1,428 @@
-<!-- nueva-orden.html -->
-<div class="nueva-orden-container bg-gris-fondo min-h-screen p-4 md:p-6 font-sans">
+<div class="p-4 md:p-6 bg-gradient-to-br from-gray-50 to-blue-50/30 min-h-screen font-sans">
   
-  <!-- NOTIFICACIÓN FLOTANTE (Toast) - Diseño Premium -->
+  <!-- ============================================ -->
+  <!-- SISTEMA DE NOTIFICACIONES MEJORADO            -->
+  <!-- ============================================ -->
   <div *ngIf="notificacion" 
-       class="fixed top-4 right-4 z-50 max-w-sm w-full shadow-2xl rounded-lg transform transition-all duration-500 ease-in-out"
+       class="fixed top-4 right-4 z-[9999] px-5 py-4 rounded-2xl backdrop-blur-md border shadow-2xl flex items-center gap-3 transition-all transform duration-300 print:hidden animate-slide-down max-w-sm w-full"
        [ngClass]="{
-         'bg-verde-esmeralda text-white': notificacion.tipo === 'exito',
-         'bg-rojo-alerta text-white': notificacion.tipo === 'error'
+         'bg-emerald-50/90 border-emerald-200 text-emerald-700': notificacion.tipo === 'exito',
+         'bg-red-50/90 border-red-200 text-red-700': notificacion.tipo === 'error',
+         'bg-amber-50/90 border-amber-200 text-amber-700': notificacion.tipo === 'advertencia'
        }">
-    <div class="flex items-center p-4">
-      <div class="flex-shrink-0 mr-3">
-        <svg *ngIf="notificacion.tipo === 'exito'" class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-        </svg>
-        <svg *ngIf="notificacion.tipo === 'error'" class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-        </svg>
+    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+         [ngClass]="{
+           'bg-emerald-100 text-emerald-600': notificacion.tipo === 'exito',
+           'bg-red-100 text-red-600': notificacion.tipo === 'error',
+           'bg-amber-100 text-amber-600': notificacion.tipo === 'advertencia'
+         }">
+      <i class="pi text-xl" 
+         [ngClass]="{
+           'pi-check-circle': notificacion.tipo === 'exito',
+           'pi-exclamation-circle': notificacion.tipo === 'error',
+           'pi-exclamation-triangle': notificacion.tipo === 'advertencia'
+         }"></i>
+    </div>
+    <span class="font-semibold text-sm flex-1">{{ notificacion.mensaje }}</span>
+    <button (click)="notificacion = null" class="text-gray-400 hover:text-gray-600 transition-colors">
+      <i class="pi pi-times text-sm"></i>
+    </button>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- HEADER DEL PUNTO DE VENTA                    -->
+  <!-- ============================================ -->
+  <div class="mb-6 print:hidden animate-fadeIn">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800 tracking-tight flex items-center gap-3">
+          <span class="w-10 h-10 bg-azul-clinico rounded-2xl flex items-center justify-center text-white shadow-lg shadow-azul-clinico/30">
+            <i class="pi pi-heart text-lg"></i>
+          </span>
+          Punto de Recepción
+        </h1>
+        <p class="text-gray-500 text-sm mt-1 font-medium ml-1">Gestión de órdenes, exámenes y facturación integrada</p>
       </div>
-      <div class="flex-1">
-        <p class="text-sm font-medium">{{ notificacion.mensaje }}</p>
+      <div class="flex items-center gap-2 text-sm bg-white px-4 py-2 rounded-2xl shadow-sm border border-gray-100">
+        <span class="w-2 h-2 rounded-full bg-verde-esmeralda animate-pulse"></span>
+        <span class="font-medium text-gray-600">Sistema <span class="text-gray-900 font-bold">Online</span></span>
       </div>
-      <button (click)="notificacion = null" class="flex-shrink-0 ml-4 text-white hover:text-gray-200 transition-colors">
-        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-        </svg>
-      </button>
     </div>
   </div>
 
-  <!-- TÍTULO PRINCIPAL -->
-  <div class="mb-6 flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-azul-clinico flex items-center">
-        <span class="bg-azul-clinico text-white p-2 rounded-lg mr-3">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-          </svg>
-        </span>
-        Nueva Orden de Exámenes
-      </h1>
-      <p class="text-sm text-gray-500 mt-1 ml-2">Laboratorio Clínico • Sistema de Atención</p>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-azul-clinico/10 text-azul-clinico">
-        Paso {{ pasoActual }} de 3
-      </span>
-    </div>
-  </div>
-
-  <!-- PROGRESS BAR - Visualización de flujo -->
-  <div class="mb-8 bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center flex-1">
-        <div class="flex items-center">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-               [ngClass]="{
-                 'bg-verde-esmeralda text-white': pasoActual > 1,
-                 'bg-azul-clinico text-white': pasoActual === 1,
-                 'bg-gray-200 text-gray-500': pasoActual < 1
-               }">
+  <!-- ============================================ -->
+  <!-- GRID PRINCIPAL                               -->
+  <!-- ============================================ -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+    
+    <!-- ========================================== -->
+    <!-- COLUMNA IZQUIERDA (2/3)                    -->
+    <!-- ========================================== -->
+    <div class="lg:col-span-2 space-y-6 print:hidden">
+      
+      <!-- ======================================== -->
+      <!-- PASO 1: BÚSQUEDA DE PACIENTE             -->
+      <!-- ======================================== -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100/80 hover:shadow-md transition-shadow duration-300">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-9 h-9 rounded-xl bg-azul-clinico/10 text-azul-clinico flex items-center justify-center text-sm font-black flex-shrink-0">
             1
           </div>
-          <span class="ml-2 text-sm font-medium text-gray-700">Selección</span>
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">Identificar Paciente</h2>
+            <p class="text-xs text-gray-400 font-medium">Buscar por DNI o Carnet de Extranjería</p>
+          </div>
         </div>
-        <div class="flex-1 h-1 mx-4 bg-gray-200 rounded-full">
-          <div class="h-1 rounded-full transition-all duration-500"
-               [ngStyle]="{'width': pasoActual >= 2 ? '100%' : '0%'}"
-               [ngClass]="{'bg-verde-esmeralda': pasoActual >= 2, 'bg-gray-300': pasoActual < 2}"></div>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <i class="pi pi-id-card absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+            <input 
+              type="text" 
+              [(ngModel)]="dniBusqueda" 
+              placeholder="Ingrese DNI del paciente..." 
+              class="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 bg-gray-50 rounded-2xl focus:ring-4 focus:ring-azul-clinico/20 focus:border-azul-clinico outline-none font-mono font-bold tracking-wide focus:bg-white transition-all duration-200" 
+              [class.border-red-300]="errorPaciente"
+              [class.bg-red-50]="errorPaciente"
+              (keyup.enter)="buscarPaciente()"
+              [disabled]="pacienteActual"
+              placeholder="Ingrese DNI del paciente...">
+            <span *ngIf="dniBusqueda && !pacienteActual" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono">Enter ↵</span>
+          </div>
+          <button 
+            (click)="buscarPaciente()" 
+            [disabled]="buscandoPaciente || pacienteActual" 
+            class="bg-azul-clinico hover:bg-azul-clinico-light text-white font-bold px-8 py-3.5 rounded-2xl transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[130px]">
+            <span *ngIf="!buscandoPaciente"><i class="pi pi-search mr-2"></i> Buscar</span>
+            <span *ngIf="buscandoPaciente"><i class="pi pi-spinner pi-spin mr-2"></i> Buscando</span>
+          </button>
+        </div>
+
+        <!-- Error de búsqueda -->
+        <div *ngIf="errorPaciente" class="mt-4 p-3.5 bg-red-50 text-red-600 rounded-2xl text-sm font-medium flex items-center gap-3 border border-red-100 animate-shake">
+          <i class="pi pi-exclamation-triangle text-lg flex-shrink-0"></i>
+          <span>{{ errorPaciente }}</span>
+        </div>
+        
+        <!-- Paciente encontrado -->
+        <div *ngIf="pacienteActual" class="mt-5 p-4 bg-gradient-to-r from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl flex items-center justify-between animate-fadeIn shadow-sm">
+          <div class="flex items-center gap-4 min-w-0">
+            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-azul-clinico shadow-md font-black text-xl flex-shrink-0 border-2 border-white">
+              {{ pacienteActual.nombres.charAt(0) }}{{ pacienteActual.apellidos?.charAt(0) || '' }}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-azul-clinico uppercase font-black tracking-wider bg-white/80 px-2 py-0.5 rounded-lg"><i class="pi pi-check-circle mr-1"></i>Verificado</span>
+              </div>
+              <p class="text-lg font-extrabold text-gray-800 leading-tight truncate">{{ pacienteActual.nombres }} {{ pacienteActual.apellidos }}</p>
+              <p class="text-xs text-gray-500 font-mono font-bold mt-0.5">DNI: {{ pacienteActual.dni }}</p>
+            </div>
+          </div>
+          <button 
+            (click)="limpiarPaciente()" 
+            class="w-11 h-11 rounded-2xl text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all duration-200 bg-white border border-gray-200 shadow-sm hover:shadow-md flex-shrink-0 ml-2"
+            title="Cambiar paciente">
+            <i class="pi pi-user-minus text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Indicador de paso completado -->
+        <div *ngIf="pacienteActual" class="mt-3 flex items-center gap-2 text-xs text-verde-esmeralda font-bold">
+          <i class="pi pi-check-circle"></i>
+          <span>Paciente seleccionado correctamente</span>
         </div>
       </div>
-      <div class="flex items-center flex-1">
-        <div class="flex items-center">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-               [ngClass]="{
-                 'bg-verde-esmeralda text-white': pasoActual > 2,
-                 'bg-azul-clinico text-white': pasoActual === 2,
-                 'bg-gray-200 text-gray-500': pasoActual < 2
-               }">
+
+      <!-- ======================================== -->
+      <!-- PASO 2: CATÁLOGO DE EXÁMENES             -->
+      <!-- ======================================== -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100/80 transition-all duration-300" 
+           [class.opacity-50]="!pacienteActual || pasoActual > 1" 
+           [class.pointer-events-none]="!pacienteActual || pasoActual > 1">
+        
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-9 h-9 rounded-xl bg-azul-clinico/10 text-azul-clinico flex items-center justify-center text-sm font-black flex-shrink-0">
             2
           </div>
-          <span class="ml-2 text-sm font-medium text-gray-700">Pago</span>
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">Catálogo de Exámenes</h2>
+            <p class="text-xs text-gray-400 font-medium">{{ catalogoExamenes.length }} exámenes disponibles</p>
+          </div>
+          <div class="ml-auto flex items-center gap-2 text-xs text-gray-400 bg-gray-50 px-3 py-1.5 rounded-xl">
+            <i class="pi pi-info-circle"></i>
+            <span>Click para agregar</span>
+          </div>
         </div>
-        <div class="flex-1 h-1 mx-4 bg-gray-200 rounded-full">
-          <div class="h-1 rounded-full transition-all duration-500"
-               [ngStyle]="{'width': pasoActual >= 3 ? '100%' : '0%'}"
-               [ngClass]="{'bg-verde-esmeralda': pasoActual >= 3, 'bg-gray-300': pasoActual < 3}"></div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+          <div 
+            *ngFor="let examen of catalogoExamenes" 
+            class="border-2 border-gray-100 bg-gray-50/50 p-4 rounded-2xl hover:border-azul-clinico hover:bg-white hover:shadow-md cursor-pointer transition-all duration-200 flex justify-between items-center group"
+            [class.opacity-50]="carrito.find(item => item.idExamen === (examen.idExamen || examen.codigo))"
+            [class.border-azul-clinico]="carrito.find(item => item.idExamen === (examen.idExamen || examen.codigo))"
+            (click)="agregarAlCarrito(examen)">
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-gray-800 text-sm group-hover:text-azul-clinico transition-colors truncate">{{ examen.descripcion }}</p>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider"><i class="pi pi-filter mr-1"></i>{{ examen.tipoTuboDefecto || 'General' }}</span>
+                <span *ngIf="carrito.find(item => item.idExamen === (examen.idExamen || examen.codigo))" class="text-[10px] text-verde-esmeralda font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                  <i class="pi pi-check mr-1"></i>Agregado
+                </span>
+              </div>
+            </div>
+            <div class="text-right flex flex-col items-end ml-3">
+              <p class="font-black text-verde-esmeralda text-base">S/ {{ examen.precioBase | number:'1.2-2' }}</p>
+              <span class="text-[10px] text-white bg-azul-clinico font-bold uppercase opacity-0 group-hover:opacity-100 transition-all duration-200 px-3 py-1 rounded-lg mt-1 shadow-sm">
+                <i class="pi pi-plus mr-1"></i>Añadir
+              </span>
+            </div>
+          </div>
+          
+          <div *ngIf="catalogoExamenes.length === 0" class="col-span-1 sm:col-span-2 text-center text-gray-400 py-16 border-2 border-dashed border-gray-200 rounded-2xl">
+            <i class="pi pi-spinner pi-spin text-4xl mb-3 opacity-50 block"></i>
+            <p class="font-bold text-sm">Cargando catálogo...</p>
+            <p class="text-xs text-gray-300 mt-1">Conectando con el servidor</p>
+          </div>
         </div>
       </div>
-      <div class="flex items-center flex-1">
-        <div class="flex items-center">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-               [ngClass]="{
-                 'bg-verde-esmeralda text-white': pasoActual >= 3,
-                 'bg-gray-200 text-gray-500': pasoActual < 3
-               }">
+    </div>
+
+    <!-- ========================================== -->
+    <!-- COLUMNA DERECHA (1/3) - CARRITO Y PAGO     -->
+    <!-- ========================================== -->
+    <div class="lg:col-span-1">
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100/80 hover:shadow-md transition-shadow duration-300 flex flex-col h-full sticky top-6">
+        
+        <!-- Header del Carrito -->
+        <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
+          <div class="w-9 h-9 rounded-xl bg-azul-clinico/10 text-azul-clinico flex items-center justify-center text-sm font-black flex-shrink-0">
             3
           </div>
-          <span class="ml-2 text-sm font-medium text-gray-700">Ticket</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PASO 1: ARMAR ORDEN (Selección de Paciente + Catálogo) -->
-  <div *ngIf="pasoActual === 1">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- COLUMNA IZQUIERDA: BÚSQUEDA DE PACIENTE -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-          <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4 flex items-center">
-            <span class="bg-azul-clinico/10 text-azul-clinico p-1.5 rounded-lg mr-2">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">Orden Actual</h2>
+            <p class="text-xs text-gray-400 font-medium">{{ carrito.length }} {{ carrito.length === 1 ? 'examen' : 'exámenes' }}</p>
+          </div>
+          <div class="ml-auto">
+            <span class="text-xs font-bold px-2 py-1 rounded-lg" 
+                  [ngClass]="{
+                    'bg-gray-100 text-gray-500': pasoActual === 1,
+                    'bg-amber-100 text-amber-700': pasoActual === 2,
+                    'bg-emerald-100 text-emerald-700': pasoActual === 3
+                  }">
+              {{ pasoActual === 1 ? 'Selección' : pasoActual === 2 ? 'Pago' : 'Completado' }}
             </span>
-            Paciente
-          </h3>
-
-          <!-- Buscador DNI -->
-          <div *ngIf="!pacienteActual" class="space-y-3">
-            <div class="flex gap-2">
-              <input type="text" 
-                     [(ngModel)]="dniBusqueda" 
-                     placeholder="Ingrese DNI (8 dígitos)"
-                     class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-azul-clinico focus:border-transparent transition-all text-sm"
-                     (keyup.enter)="buscarPaciente()">
-              <button (click)="buscarPaciente()" 
-                      [disabled]="buscandoPaciente"
-                      class="px-4 py-2 bg-azul-clinico text-white rounded-lg hover:bg-azul-clinico-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium whitespace-nowrap">
-                <span *ngIf="!buscandoPaciente">Buscar</span>
-                <span *ngIf="buscandoPaciente" class="flex items-center">
-                  <svg class="animate-spin h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Buscando
-                </span>
-              </button>
-            </div>
-            <p *ngIf="errorPaciente" class="text-sm text-rojo-alerta bg-red-50 p-2 rounded-lg">{{ errorPaciente }}</p>
-          </div>
-
-          <!-- Paciente Encontrado -->
-          <div *ngIf="pacienteActual" class="bg-verde-esmeralda/5 border border-verde-esmeralda/20 rounded-lg p-4">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="font-medium text-gray-900">{{ pacienteActual.nombres }} {{ pacienteActual.apellidos }}</p>
-                <p class="text-sm text-gray-600">DNI: {{ pacienteActual.dni }}</p>
-                <p class="text-sm text-gray-600 mt-1">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-verde-esmeralda/20 text-verde-esmeralda">
-                    Activo
-                  </span>
-                </p>
-              </div>
-              <button (click)="limpiarPaciente()" 
-                      class="text-gray-400 hover:text-rojo-alerta transition-colors">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- COLUMNA DERECHA (2/3): CATÁLOGO Y CARRITO -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider flex items-center">
-              <span class="bg-azul-clinico/10 text-azul-clinico p-1.5 rounded-lg mr-2">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
-              </span>
-              Catálogo de Exámenes
-            </h3>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-gray-500">{{ catalogoExamenes.length }} exámenes disponibles</span>
-            </div>
-          </div>
-
-          <!-- Grid de Exámenes -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
-            <div *ngFor="let examen of catalogoExamenes" 
-                 class="border border-gray-100 rounded-lg p-3 hover:border-azul-clinico/30 hover:shadow-sm transition-all cursor-pointer"
-                 (click)="agregarAlCarrito(examen)">
-              <div class="flex items-start justify-between">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-800 truncate">{{ examen.descripcion }}</p>
-                  <p class="text-xs text-gray-500 mt-0.5">Código: {{ examen.codigoExamen || 'N/A' }}</p>
-                </div>
-                <span class="ml-2 text-xs font-semibold text-verde-esmeralda bg-verde-esmeralda/10 px-2 py-0.5 rounded-full">
-                  S/ {{ examen.precioBase | number:'1.2-2' }}
-                </span>
-              </div>
-              <button class="mt-2 w-full text-xs text-azul-clinico hover:text-azul-clinico-light font-medium flex items-center justify-center gap-1 border border-azul-clinico/20 rounded-lg py-1 hover:bg-azul-clinico/5 transition-colors">
-                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Agregar
-              </button>
-            </div>
           </div>
         </div>
 
-        <!-- CARRITO DE COMPRAS -->
-        <div class="mt-4 bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider flex items-center">
-              <span class="bg-azul-clinico/10 text-azul-clinico p-1.5 rounded-lg mr-2">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-              </span>
-              Carrito
-            </h3>
-            <span class="text-xs text-gray-500">{{ carrito.length }} ítem(s)</span>
-          </div>
+        <!-- Contenido del Carrito -->
+        <div class="flex-1">
+          <!-- PASO 1 y 2: Vista del Carrito -->
+          <div *ngIf="pasoActual === 1 || pasoActual === 2" class="animate-fadeIn">
+            
+            <!-- Carrito Vacío -->
+            <div *ngIf="carrito.length === 0" class="h-full flex flex-col items-center justify-center text-gray-400 py-12 border-2 border-dashed border-gray-100 rounded-2xl">
+              <i class="pi pi-shopping-cart text-5xl mb-4 opacity-30"></i>
+              <p class="font-bold text-gray-500">Carrito vacío</p>
+              <p class="text-xs text-center mt-1 px-6 font-medium">Seleccione exámenes del catálogo</p>
+            </div>
 
-          <div *ngIf="carrito.length === 0" class="text-center py-4 text-gray-400 text-sm">
-            No hay exámenes agregados
-          </div>
-
-          <div *ngIf="carrito.length > 0">
-            <div class="space-y-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
-              <div *ngFor="let item of carrito; let i = index" 
-                   class="flex items-center justify-between bg-gray-50/50 p-2 rounded-lg">
+            <!-- Lista de exámenes -->
+            <ul class="space-y-2.5 mb-4 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
+              <li *ngFor="let item of carrito; let i = index" 
+                  class="flex justify-between items-center p-3.5 bg-gray-50 border border-gray-100 rounded-2xl group transition-all hover:border-gray-200 hover:bg-white">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-700 truncate">{{ item.descripcion }}</p>
+                  <p class="font-bold text-gray-800 text-sm truncate">{{ item.descripcion }}</p>
+                  <p class="text-[10px] text-gray-400 font-mono font-semibold">{{ item.codigo || 'N/A' }}</p>
                 </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-sm font-semibold text-verde-esmeralda">S/ {{ item.precioBase | number:'1.2-2' }}</span>
-                  <button (click)="quitarDelCarrito(i)" 
-                          class="text-gray-400 hover:text-rojo-alerta transition-colors">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+                <div class="text-right flex items-center gap-3 ml-2">
+                  <p class="font-black text-gray-800 text-sm whitespace-nowrap">S/ {{ item.precioBase | number:'1.2-2' }}</p>
+                  <button 
+                    *ngIf="pasoActual === 1" 
+                    (click)="quitarDelCarrito(i)" 
+                    class="w-8 h-8 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all duration-200"
+                    title="Quitar examen">
+                    <i class="pi pi-times text-sm"></i>
                   </button>
                 </div>
+              </li>
+            </ul>
+
+            <!-- Total y Acciones -->
+            <div *ngIf="carrito.length > 0" class="border-t border-gray-100 pt-4 mt-2">
+              <div class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 rounded-2xl border border-blue-100 mb-5">
+                <p class="text-xs font-black text-gray-500 uppercase tracking-widest">Total a Pagar</p>
+                <p class="text-2xl font-black text-verde-esmeralda tracking-tight">S/ {{ totalCarrito | number:'1.2-2' }}</p>
+              </div>
+
+              <!-- Botón Confirmar Orden (Paso 1) -->
+              <button 
+                *ngIf="pasoActual === 1" 
+                (click)="generarOrden()" 
+                [disabled]="procesando" 
+                class="w-full bg-azul-clinico hover:bg-azul-clinico-light text-white font-bold py-4 rounded-2xl transition-all duration-300 shadow-lg shadow-azul-clinico/30 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98] text-sm uppercase tracking-wider">
+                <span *ngIf="!procesando"><i class="pi pi-check-circle mr-2 text-lg"></i> Confirmar Orden</span>
+                <span *ngIf="procesando"><i class="pi pi-spinner pi-spin mr-2 text-lg"></i> Generando...</span>
+              </button>
+
+              <!-- Panel de Pago (Paso 2) -->
+              <div *ngIf="pasoActual === 2" class="animate-slide-up">
+                <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 mb-4">
+                  <p class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Método de Pago</p>
+                  <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center p-3 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-azul-clinico transition-all has-[:checked]:border-azul-clinico has-[:checked]:bg-blue-50/50">
+                      <input type="radio" [(ngModel)]="metodoPago" value="EFECTIVO" name="pago" class="text-azul-clinico focus:ring-azul-clinico w-4 h-4 mr-2">
+                      <span class="text-sm font-bold text-gray-700">Efectivo</span>
+                    </label>
+                    <label class="flex items-center p-3 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-azul-clinico transition-all has-[:checked]:border-azul-clinico has-[:checked]:bg-blue-50/50">
+                      <input type="radio" [(ngModel)]="metodoPago" value="BILLETERA_DIGITAL" name="pago" class="text-azul-clinico focus:ring-azul-clinico w-4 h-4 mr-2">
+                      <span class="text-sm font-bold text-gray-700">Yape / Plin</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <button 
+                  (click)="registrarPago()" 
+                  [disabled]="procesando" 
+                  class="w-full bg-verde-esmeralda hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl transition-all duration-300 shadow-lg shadow-emerald-600/30 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98] text-sm uppercase tracking-wider">
+                  <span *ngIf="!procesando"><i class="pi pi-credit-card mr-2 text-lg"></i> Pagar S/ {{ totalCarrito | number:'1.2-2' }}</span>
+                  <span *ngIf="procesando"><i class="pi pi-spinner pi-spin mr-2 text-lg"></i> Procesando...</span>
+                </button>
               </div>
             </div>
+          </div>
 
-            <div class="border-t border-gray-200 mt-3 pt-3 flex items-center justify-between">
-              <span class="text-sm font-medium text-gray-700">Total:</span>
-              <span class="text-lg font-bold text-azul-clinico">S/ {{ totalCarrito | number:'1.2-2' }}</span>
+          <!-- ======================================== -->
+          <!-- PASO 3: TICKET Y EXPORTACIÓN             -->
+          <!-- ======================================== -->
+          <div *ngIf="pasoActual === 3" class="animate-slide-up">
+            
+            <!-- Ticket Térmico -->
+            <div id="ticket-termico" class="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-lg mx-auto max-w-[320px] print:max-w-full print:shadow-none print:border-none">
+              <div class="h-1 w-full bg-gradient-to-r from-azul-clinico via-verde-esmeralda to-azul-clinico print:hidden"></div>
+              
+              <div class="p-5 pt-6 font-mono text-xs text-gray-800">
+                <!-- Cabecera -->
+                <div class="text-center mb-4 border-b border-dashed border-gray-300 pb-4">
+                  <div class="flex justify-center mb-2">
+                    <div class="w-12 h-12 bg-azul-clinico/10 rounded-2xl flex items-center justify-center">
+                      <i class="pi pi-shield text-3xl text-azul-clinico"></i>
+                    </div>
+                  </div>
+                  <h3 class="font-extrabold text-base tracking-widest uppercase text-gray-900">Camarena Lab</h3>
+                  <p class="text-[10px] uppercase font-bold text-gray-500 mt-0.5">Tecnología Diagnóstica</p>
+                  <div class="mt-2 text-[10px] text-gray-600 leading-relaxed">
+                    <p>RUC: 20123456789</p>
+                    <p>Av. Giráldez 123, Huancayo</p>
+                  </div>
+                </div>
+
+                <!-- Datos de la Orden -->
+                <div class="space-y-1.5 mb-4 border-b border-dashed border-gray-300 pb-4 text-[11px]">
+                  <p class="flex justify-between">
+                    <span class="text-gray-500">FECHA:</span> 
+                    <span class="font-bold">{{ ordenGenerada?.fechaEmision | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </p>
+                  <p class="flex justify-between items-center">
+                    <span class="text-gray-500">TICKET:</span> 
+                    <span class="font-bold text-sm bg-gray-100 px-2 py-0.5 rounded print:bg-transparent">{{ ordenGenerada?.codigoTicket }}</span>
+                  </p>
+                  <p class="flex justify-between items-start pt-1">
+                    <span class="text-gray-500">PACIENTE:</span> 
+                    <span class="text-right font-bold max-w-[150px] leading-tight">{{ ordenGenerada?.nombrePaciente | uppercase }}</span>
+                  </p>
+                  <p class="flex justify-between">
+                    <span class="text-gray-500">DNI:</span> 
+                    <span class="font-bold">{{ pacienteActual?.dni }}</span>
+                  </p>
+                </div>
+
+                <!-- Detalle de Exámenes -->
+                <div class="mb-4 border-b border-dashed border-gray-300 pb-4">
+                  <p class="font-black text-[11px] uppercase tracking-wider text-gray-700 mb-2.5">Detalle Analítico</p>
+                  <div *ngFor="let item of carrito" class="flex justify-between text-[10px] py-1 border-b border-gray-50 last:border-0">
+                    <span class="font-bold flex-1 mr-2">{{ item.descripcion | uppercase }}</span>
+                    <span class="font-bold whitespace-nowrap">S/ {{ item.precioBase | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+
+                <!-- Totales -->
+                <div class="text-right font-bold text-sm mb-4 space-y-1">
+                  <p class="flex justify-between text-gray-500 text-xs">
+                    <span>SUBTOTAL:</span> 
+                    <span>S/ {{ totalCarrito | number:'1.2-2' }}</span>
+                  </p>
+                  <p class="flex justify-between text-gray-500 text-xs">
+                    <span>IGV (0%):</span> 
+                    <span>S/ 0.00</span>
+                  </p>
+                  <p class="flex justify-between items-center text-base pt-2 border-t-2 border-gray-300">
+                    <span class="uppercase tracking-widest font-black text-gray-800">TOTAL</span> 
+                    <span class="font-black text-verde-esmeralda">S/ {{ totalCarrito | number:'1.2-2' }}</span>
+                  </p>
+                  <p class="flex justify-between text-[10px] font-normal pt-1">
+                    <span class="text-gray-500">FORMA DE PAGO:</span> 
+                    <span class="font-bold">{{ metodoPago === 'EFECTIVO' ? 'Efectivo' : 'Yape / Plin' }}</span>
+                  </p>
+                </div>
+
+                <!-- Promesa de Entrega -->
+                <div class="text-center mb-4 bg-gray-50/80 p-3 rounded-xl border border-gray-200 print:border-gray-300">
+                  <p class="text-[10px] uppercase font-bold text-gray-500 mb-0.5">Resultados disponibles hoy</p>
+                  <p class="text-xl font-black text-gray-900 tracking-wider">18:30 HRS</p>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center text-gray-500 text-[10px]">
+                  <p class="font-black text-sm text-gray-900 mb-2 border-2 border-gray-800 p-1.5 inline-block print:border-gray-600 uppercase tracking-wider">*** PASE A SALA DE TÓPICO ***</p>
+                  <p class="mt-3 leading-relaxed text-[11px] text-gray-600">
+                    Consulte su diagnóstico en:<br>
+                    <span class="font-bold text-gray-900 text-xs mt-1 block">www.camarena-lab.com</span>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="h-1 w-full bg-gradient-to-r from-azul-clinico via-verde-esmeralda to-azul-clinico print:hidden"></div>
+            </div>
+
+            <!-- Botonera de Exportación -->
+            <div class="flex flex-col gap-2.5 mt-5 print:hidden">
+              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center border-b border-gray-100 pb-2">Acciones de Emisión</p>
+
+              <!-- Botón Imprimir -->
+              <button 
+                (click)="imprimirTicket()" 
+                class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 rounded-2xl transition-all duration-300 shadow-lg shadow-gray-800/20 flex justify-center items-center active:scale-[0.98]">
+                <i class="pi pi-print mr-2 text-xl"></i> Imprimir Ticket Térmico
+              </button>
+              
+              <!-- Botones PDF y Correo -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <button 
+                  (click)="descargarPDF()" 
+                  [disabled]="procesando" 
+                  class="w-full bg-red-50 text-red-600 border-2 border-red-200 hover:bg-red-100 hover:border-red-300 font-bold py-3 rounded-2xl transition-all duration-200 shadow-sm flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                  <i class="pi pi-file-pdf mr-2 text-lg"></i> PDF
+                </button>
+                <button 
+                  (click)="enviarCorreo()" 
+                  [disabled]="procesando" 
+                  class="w-full bg-blue-50 text-blue-600 border-2 border-blue-200 hover:bg-blue-100 hover:border-blue-300 font-bold py-3 rounded-2xl transition-all duration-200 shadow-sm flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                  <i class="pi pi-envelope mr-2 text-lg"></i> Correo
+                </button>
+              </div>
+
+              <!-- Botón Reiniciar -->
+              <button 
+                (click)="reiniciarPuntoVenta()" 
+                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 font-bold py-3.5 rounded-2xl transition-all duration-200 mt-2 flex items-center justify-center gap-2">
+                <i class="pi pi-plus-circle"></i>
+                Atender Nuevo Paciente
+              </button>
             </div>
           </div>
-
-          <button (click)="generarOrden()" 
-                  [disabled]="!pacienteActual || carrito.length === 0 || procesando"
-                  class="mt-4 w-full py-2.5 bg-verde-esmeralda text-white rounded-lg hover:bg-verde-esmeralda/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
-            <span *ngIf="!procesando">Generar Orden</span>
-            <span *ngIf="procesando" class="flex items-center justify-center">
-              <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Procesando
-            </span>
-          </button>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- PASO 2: PAGO -->
-  <div *ngIf="pasoActual === 2 && ordenGenerada">
-    <div class="max-w-2xl mx-auto">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-        <div class="flex items-center mb-6">
-          <span class="bg-azul-clinico/10 text-azul-clinico p-2 rounded-lg mr-3">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-            </svg>
-          </span>
-          <div>
-            <h3 class="text-lg font-bold text-gray-800">Confirmar Pago</h3>
-            <p class="text-sm text-gray-500">Orden #{{ ordenGenerada.idOrden || 'N/A' }}</p>
-          </div>
-        </div>
-
-        <div class="bg-gray-50 rounded-lg p-4 mb-4">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Paciente:</span>
-            <span class="font-medium text-gray-800">{{ pacienteActual?.nombres }} {{ pacienteActual?.apellidos }}</span>
-          </div>
-          <div class="flex justify-between text-sm mt-1">
-            <span class="text-gray-600">DNI:</span>
-            <span class="font-medium text-gray-800">{{ pacienteActual?.dni }}</span>
-          </div>
-          <div class="flex justify-between text-sm mt-1">
-            <span class="text-gray-600">Total:</span>
-            <span class="font-bold text-azul-clinico">S/ {{ totalCarrito | number:'1.2-2' }}</span>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pago</label>
-          <div class="grid grid-cols-2 gap-2">
-            <button (click)="metodoPago = 'EFECTIVO'"
-                    class="py-2.5 px-4 rounded-lg border-2 transition-all text-sm font-medium"
-                    [ngClass]="{
-                      'border-azul-clinico bg-azul-clinico/5 text-azul-clinico': metodoPago === 'EFECTIVO',
-                      'border-gray-200 text-gray-600 hover:border-gray-300': metodoPago !== 'EFECTIVO'
-                    }">
-              💰 Efectivo
-            </button>
-            <button (click)="metodoPago = 'YAPE'"
-                    class="py-2.5 px-4 rounded-lg border-2 transition-all text-sm font-medium"
-                    [ngClass]="{
-                      'border-fuchsia-400 bg-fuchsia-50 text-fuchsia-600': metodoPago === 'YAPE',
-                      'border-gray-200 text-gray-600 hover:border-gray-300': metodoPago !== 'YAPE'
-                    }">
-              📱 Yape
-            </button>
-            <button (click)="metodoPago = 'PLIN'"
-                    class="py-2.5 px-4 rounded-lg border-2 transition-all text-sm font-medium"
-                    [ngClass]="{
-                      'border-fuchsia-400 bg-fuchsia-50 text-fuchsia-600': metodoPago === 'PLIN',
-                      'border-gray-200 text-gray-600 hover:border-gray-300': metodoPago !== 'PLIN'
-                    }">
-              📱 Plin
-            </button>
-            <button (click)="metodoPago = 'TARJETA'"
-                    class="py-2.5 px-4 rounded-lg border-2 transition-all text-sm font-medium"
-                    [ngClass]="{
-                      'border-azul-clinico bg-azul-clinico/5 text-azul-clinico': metodoPago === 'TARJETA',
-                      'border-gray-200 text-gray-600 hover:border-gray-300': metodoPago !== 'TARJETA'
-                    }">
-              💳 Tarjeta
-            </button>
-          </div>
-        </div>
-
-        <div class="flex gap-3">
-          <button (click)="registrarPago()" 
-                  [disabled]="procesando"
-                  class="flex-1 py-2.5 bg-verde-esmeralda text-white rounded-lg hover:bg-verde-esmeralda/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
-            <span *ngIf="!procesando">Confirmar Pago</span>
-            <span *ngIf="procesando" class="flex items-center justify-center">
-              <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Procesando
-            </span>
-          </button>
-          <button (click)="pasoActual = 1" 
-                  class="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
-            Volver
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PASO 3: TICKET FINAL -->
-  <div *ngIf="pasoActual === 3 && ordenGenerada" class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow text-center">
-      <div class="w-20 h-20 bg-verde-esmeralda/10 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="h-10 w-10 text-verde-esmeralda" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <h3 class="text-xl font-bold text-gray-800 mb-2">¡Orden Completada!</h3>
-      <p class="text-gray-600 text-sm mb-4">El ticket de atención ha sido emitido correctamente.</p>
-      
-      <div class="bg-gray-50 rounded-lg p-4 text-left mb-4">
-        <p class="text-sm font-medium text-gray-700">Resumen de la Orden</p>
-        <div class="mt-2 space-y-1 text-sm">
-          <div class="flex justify-between">
-            <span class="text-gray-600">Orden N°:</span>
-            <span class="font-medium text-gray-800">{{ ordenGenerada.idOrden || 'N/A' }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Paciente:</span>
-            <span class="font-medium text-gray-800">{{ pacienteActual?.nombres }} {{ pacienteActual?.apellidos }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">DNI:</span>
-            <span class="font-medium text-gray-800">{{ pacienteActual?.dni }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Método de Pago:</span>
-            <span class="font-medium text-gray-800">{{ metodoPago }}</span>
-          </div>
-          <div class="flex justify-between border-t border-gray-200 pt-2 mt-2">
-            <span class="font-semibold text-gray-700">Total:</span>
-            <span class="font-bold text-azul-clinico">S/ {{ totalCarrito | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <button (click)="reiniciarPuntoVenta()" 
-              class="w-full py-2.5 bg-azul-clinico text-white rounded-lg hover:bg-azul-clinico-light transition-colors font-medium text-sm">
-        Nueva Orden
-      </button>
-    </div>
-  </div>
-
 </div>
 
-<!-- Estilos adicionales para scrollbar personalizada -->
-<style>
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #0f4c81;
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #1e66a3;
-  }
-</style>

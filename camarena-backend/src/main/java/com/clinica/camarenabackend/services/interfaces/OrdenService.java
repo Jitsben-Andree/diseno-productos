@@ -14,4 +14,8 @@ public interface OrdenService {
 
 
     List<OrdenResponse> listarPendientesTopico();
+
+
+    List<OrdenResponse> buscarHistorial(String filtro);
+    void anularOrden(UUID idOrden, String motivo);
 }

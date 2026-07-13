@@ -51,6 +51,12 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'historial-orden',
+        loadComponent: () =>
+          import('./features/transaccional/historial-orden/historial-orden').then((m) => m.HistorialOrdenesComponent),
+      }
+      ,
+      {
         path: 'inventario',
         loadComponent: () =>
           import('./features/logistica/inventario/inventario').then((m) => m.InventarioComponent),

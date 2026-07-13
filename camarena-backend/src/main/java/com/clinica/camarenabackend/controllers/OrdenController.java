@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -41,11 +42,35 @@ public class OrdenController {
         return ResponseEntity.ok("Pago registrado correctamente. La orden ha pasado a Tópico.");
     }
 
-    // Este es el endpoint exacto que Angular estaba buscando y no encontraba
+    // 3. Este es el endpoint exacto que Angular estaba buscando y no encontraba
     @GetMapping("/pendientes-topico")
     @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPCION') or hasRole('BIOLOGO')")
     public ResponseEntity<List<OrdenResponse>> listarPendientesTopico() {
         List<OrdenResponse> lista = ordenService.listarPendientesTopico();
         return ResponseEntity.ok(lista);
+    }
+
+    // =======================================================================
+    // NUEVOS ENDPOINTS: HISTORIAL Y ANULACIONES
+    // =======================================================================
+
+    // 4. Endpoint para el Historial (Soluciona el Error 403 en Angular)
+    @GetMapping("/historial")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPCION')")
+    public ResponseEntity<List<OrdenResponse>> buscarHistorial(@RequestParam("buscar") String buscar) {
+        List<OrdenResponse> historial = ordenService.buscarHistorial(buscar);
+        return ResponseEntity.ok(historial);
+    }
+
+    // 5. Endpoint para Anular Orden y justificar Extorno
+    @PostMapping("/{idOrden}/anular")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('RECEPCION')")
+    public ResponseEntity<String> anularOrden(
+            @PathVariable UUID idOrden,
+            @RequestBody Map<String, String> body) {
+
+        String motivo = body.get("motivo");
+        ordenService.anularOrden(idOrden, motivo);
+        return ResponseEntity.ok("Orden anulada correctamente. Operación financiera extornada.");
     }
 }
