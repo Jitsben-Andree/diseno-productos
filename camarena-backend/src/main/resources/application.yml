@@ -8,9 +8,7 @@ spring:
   application:
     name: camarena-backend
 
-  # ==============================================================
   # CONFIGURACIÓN DE BASE DE DATOS (PostgreSQL)
-  # ==============================================================
   datasource:
     # MAGIA DE DOCKER: Por defecto usa localhost (para tu PC). 
     # En el VPS, docker-compose.yml lo reemplazará por "postgres-db"
@@ -19,9 +17,7 @@ spring:
     password: ${DB_PASSWORD:0102}
     driver-class-name: org.postgresql.Driver
 
-  # ==============================================================
   # CONFIGURACIÓN DE JPA / HIBERNATE
-  # ==============================================================
   jpa:
     hibernate:
       ddl-auto: update
@@ -31,18 +27,15 @@ spring:
       hibernate:
         format_sql: true
 
-# ==============================================================
+
 # VARIABLES PERSONALIZADAS DEL LABORATORIO (Camarena Digital)
-# ==============================================================
 camarena:
   security:
     jwt:
       secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
       expiration-ms: ${JWT_EXPIRATION:86400000}
 
-# ==============================================================
 # APIS EXTERNAS (Reniec)
-# ==============================================================
 api:
   reniec:
     url: https://dniruc.apisperu.com/api/v1/dni

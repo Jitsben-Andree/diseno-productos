@@ -7,7 +7,6 @@ import { environment } from '../../environments/environment';
 export class UsuarioService {
   private http = inject(HttpClient);
   
-  // ¡AQUÍ ESTÁ LA CORRECCIÓN! Apuntamos a /api/empleados
   private apiUrl = `${environment.apiUrl}/empleados`;
 
   listarUsuarios(): Observable<any[]> {
