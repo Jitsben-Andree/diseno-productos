@@ -2,7 +2,7 @@ name: Despliegue Camarena Digital sd (CI/CD)
 
 on:
   push:
-    branches: [ "main" ] # Se ejecuta al hacer push a la rama 'main'
+    branches: [ "master" ] # Se ejecuta al hacer push a la rama 'main'
 
 jobs:
   deploy:
