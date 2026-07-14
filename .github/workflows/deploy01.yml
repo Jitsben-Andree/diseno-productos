@@ -1,0 +1,58 @@
+name: Despliegue Camarena Digital sd (CI/CD)
+
+on:
+  push:
+    branches: [ "main" ] # Se ejecuta al hacer push a la rama 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Clonar código en el servidor de GitHub
+      uses: actions/checkout@v3
+
+    - name: 2. Transferir archivos al VPS (Carpeta 'diseño')
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.VPS_IP }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+        source: "." # Copia todo el proyecto actual
+        target: "/root/diseño" # Destino exacto que solicitaste
+
+    - name: 3. Ejecutar Docker Compose en el VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_IP }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+        script: |
+          echo "================================================="
+          echo "INICIANDO LEVANTAMIENTO DOCKER EN VPS"
+          echo "================================================="
+          
+          # Navegamos a la carpeta que acabamos de crear/actualizar
+          cd /root/diseño
+          
+          # Detenemos versiones anteriores
+          echo ">> Deteniendo servicios antiguos..."
+          docker-compose down
+          
+          # Construimos las nuevas imágenes (Backend y los 2 Frontends)
+          echo ">> Reconstruyendo contenedores de Docker..."
+          docker-compose build --no-cache
+          
+          # Levantamos el sistema
+          echo ">> Levantando el sistema Camarena Digital..."
+          docker-compose up -d
+          
+          # Limpiamos las imágenes viejas para no saturar el disco duro del VPS
+          echo ">> Limpiando almacenamiento residual..."
+          docker image prune -f
+          
+          echo "================================================="
+          echo "SISTEMA DESPLEGADO CON ÉXITO EN /root/diseño"
+          echo "================================================="
