@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { DashboardPacienteService } from '../../core/service/DashboardPaciente';
+import { DashboardPacienteService } from '../../core/service/dashboardpaciente';
 
 @Component({
   selector: 'app-dashboard-paciente',
