@@ -3,6 +3,7 @@ package com.clinica.camarenabackend.services.impl;
 
 import com.clinica.camarenabackend.dtos.request.DescargaPdfRequest;
 import com.clinica.camarenabackend.dtos.request.FeedbackRequest;
+import com.clinica.camarenabackend.dtos.response.PortalDashboardResponse;
 import com.clinica.camarenabackend.models.entities.FeedbackExperiencia;
 import com.clinica.camarenabackend.models.entities.OrdenLaboratorio;
 import com.clinica.camarenabackend.models.entities.ResultadosPdf;
@@ -61,5 +62,22 @@ public class PortalPacienteServiceImpl implements PortalPacienteService {
                 .build();
 
         feedbackRepository.save(feedback);
+    }
+
+    @Override
+    public PortalDashboardResponse obtenerDatosDashboard(String dni, String ticket) {
+        OrdenLaboratorio orden = ordenRepository.findByOcodigoTicket(ticket.toUpperCase())
+                .orElseThrow(() -> new RuntimeException("Ticket no encontrado en el sistema."));
+
+        if (!orden.getPaciente().getOdni().equals(dni)) {
+            throw new RuntimeException("El DNI no corresponde al titular de esta orden médica.");
+        }
+
+        return PortalDashboardResponse.builder()
+                .nombrePaciente(orden.getPaciente().getOnombres()) // Para decirle "Hola, Juan"
+                .estadoOrden(orden.getOestadoGeneral())            // Para saber si pintar el banner verde o naranja
+                .fechaEmision(orden.getOfechaEmision())
+                .codigoTicket(orden.getOcodigoTicket())
+                .build();
     }
 }

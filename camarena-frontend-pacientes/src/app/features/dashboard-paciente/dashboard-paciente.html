@@ -1,1 +1,79 @@
-<p>dashboard-paciente works!</p>
+<div class="px-5 py-6 font-sans">
+  
+  <!-- Estado de Carga -->
+  <div *ngIf="cargando" class="flex flex-col items-center justify-center py-20">
+    <i class="pi pi-spinner pi-spin text-4xl text-blue-500 mb-3"></i>
+    <p class="text-sm font-bold text-gray-400">Sincronizando con el laboratorio...</p>
+  </div>
+
+  <div *ngIf="!cargando && datosOrden" class="animate-fadeIn">
+    <!-- Saludo Dinámico -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Hola, {{ datosOrden.nombrePaciente | titlecase }}</h1>
+      <p class="text-sm text-gray-500 mt-1 font-medium">Bienvenido a Camarena Digital</p>
+    </div>
+
+    <!-- BANNER DINÁMICO: Si ya están listos los resultados -->
+    <div *ngIf="datosOrden.estadoOrden === 'FINALIZADO'" 
+         class="bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-2xl p-6 shadow-xl shadow-emerald-500/20 text-white mb-8 relative overflow-hidden">
+      <div class="absolute -right-4 -top-4 w-24 h-24 bg-white opacity-20 rounded-full blur-xl"></div>
+      
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
+            <i class="pi pi-check-circle text-emerald-50 text-sm"></i>
+          </div>
+          <span class="text-xs font-black tracking-widest uppercase text-emerald-50">Resultados Listos</span>
+        </div>
+        <h2 class="text-2xl font-extrabold mb-5 leading-tight">Tu informe médico ya fue validado por el biólogo.</h2>
+        
+        <!-- Botón que lo enviará al visor de PDF -->
+        <a routerLink="/visor-pdf" 
+           class="inline-flex items-center justify-center bg-white text-emerald-600 px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 transition-all w-full sm:w-auto active:scale-95">
+          <i class="pi pi-file-pdf mr-2"></i> Descargar PDF Oficial
+        </a>
+      </div>
+    </div>
+
+    <!-- BANNER DINÁMICO: Si aún están procesando la sangre -->
+    <div *ngIf="datosOrden.estadoOrden === 'EN_PROCESO' || datosOrden.estadoOrden === 'MUESTRAS_TOMADAS' || datosOrden.estadoOrden === 'EN_ESPERA_MUESTRA'" 
+         class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-6 shadow-xl shadow-blue-500/20 text-white mb-8 relative overflow-hidden">
+      <div class="absolute -right-4 -top-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
+      
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
+            <i class="pi pi-spin pi-spinner text-blue-100 text-sm"></i>
+          </div>
+          <span class="text-xs font-black tracking-widest uppercase text-blue-100">En Análisis</span>
+        </div>
+        <h2 class="text-xl font-bold mb-2">Tus muestras están siendo procesadas.</h2>
+        <p class="text-blue-100 text-xs mb-4">Te avisaremos cuando el informe esté firmado.</p>
+        
+        <div class="bg-black/10 rounded-lg p-3 border border-white/10 flex justify-between items-center">
+          <span class="text-xs font-medium text-blue-100">Ticket en proceso:</span>
+          <span class="text-sm font-mono font-bold tracking-widest">{{ datosOrden.codigoTicket }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accesos rápidos adicionales (UX Móvil) -->
+    <h3 class="text-lg font-bold text-gray-900 mb-4 px-1">Servicios de la Clínica</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center active:bg-gray-50 transition-colors">
+        <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-3">
+          <i class="pi pi-calendar-plus text-xl text-blue-600"></i>
+        </div>
+        <span class="text-xs font-bold text-gray-800">Agendar Cita a Domicilio</span>
+      </div>
+      
+      <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center active:bg-gray-50 transition-colors">
+        <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center mb-3">
+          <i class="pi pi-whatsapp text-xl text-purple-600"></i>
+        </div>
+        <span class="text-xs font-bold text-gray-800">Soporte por WhatsApp</span>
+      </div>
+    </div>
+
+  </div>
+</div>

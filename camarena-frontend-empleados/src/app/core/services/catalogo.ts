@@ -7,21 +7,38 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class CatalogoService {
-  private http = inject(HttpClient);
+  
   private apiUrl = `${environment.apiUrl}/catalogo`;
 
-  // Trae todos los exámenes activos con sus precios
+  constructor(private http: HttpClient) { }
+
+  // ==========================================
+  // EXÁMENES
+  // ==========================================
   listarExamenes(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/examenes`);
   }
 
-  // Crea un nuevo examen en PostgreSQL
-  crearExamen(examen: { codigo: string, descripcion: string, tipoTuboDefecto: string, precioBase: number }): Observable<any> {
+  crearExamen(examen: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/examenes`, examen);
   }
 
-  // Métodos para la inteligencia clínica (Parámetros y Rangos)
-  agregarParametro(idExamen: number, parametro: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/examenes/${idExamen}/parametros`, parametro, { responseType: 'text' });
+  // ==========================================
+  // PARÁMETROS
+  // ==========================================
+  obtenerParametrosDeExamen(idExamen: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/examenes/${idExamen}/parametros`);
+  }
+
+  agregarParametroAExamen(idExamen: number, parametro: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/examenes/${idExamen}/parametros`, parametro);
+  }
+
+  actualizarParametro(idParametro: number, parametro: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/parametros/${idParametro}`, parametro);
+  }
+
+  eliminarParametro(idParametro: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/parametros/${idParametro}`);
   }
 }

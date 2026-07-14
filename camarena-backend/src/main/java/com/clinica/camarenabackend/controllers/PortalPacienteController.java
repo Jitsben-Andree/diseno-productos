@@ -3,6 +3,7 @@ package com.clinica.camarenabackend.controllers;
 
 import com.clinica.camarenabackend.dtos.request.DescargaPdfRequest;
 import com.clinica.camarenabackend.dtos.request.FeedbackRequest;
+import com.clinica.camarenabackend.dtos.response.PortalDashboardResponse;
 import com.clinica.camarenabackend.services.interfaces.PortalPacienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +30,13 @@ public class PortalPacienteController {
     public ResponseEntity<String> enviarFeedback(@Valid @RequestBody FeedbackRequest request) {
         portalService.registrarFeedback(request);
         return ResponseEntity.ok("¡Gracias por ayudarnos a mejorar! Hemos recibido tu calificación.");
+    }
+    @GetMapping("/dashboard/{dni}/{ticket}")
+    public ResponseEntity<PortalDashboardResponse> obtenerDashboard(
+            @PathVariable String dni,
+            @PathVariable String ticket) {
+
+        PortalDashboardResponse response = portalService.obtenerDatosDashboard(dni, ticket);
+        return ResponseEntity.ok(response);
     }
 }

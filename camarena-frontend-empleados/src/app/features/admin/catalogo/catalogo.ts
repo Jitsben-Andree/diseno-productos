@@ -1,42 +1,65 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+
+// PrimeNG
 import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button'; 
+import { MessageService } from 'primeng/api';
+
 import { CatalogoService } from '../../../core/services/catalogo';
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TableModule, DialogModule],
-  templateUrl: './catalogo.html'
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TableModule,
+    ToastModule,
+    DialogModule,
+    InputTextModule,
+    ButtonModule
+  ],
+  templateUrl: './catalogo.html',
+  styleUrls: ['./catalogo.scss'],
+  providers: [MessageService]
 })
 export class CatalogoComponent implements OnInit {
-  private catalogoService = inject(CatalogoService);
-  private fb = inject(FormBuilder);
-
-  examenes: any[] = [];
-  cargando = true;
   
-  // Modal Examen
-  mostrarModalExamen = false;
-  guardando = false;
-  examenForm: FormGroup;
-
-  // Modal Parámetro
-  mostrarModalParametro = false;
+  // Exámenes
+  examenes: any[] = [];
+  cargandoExamenes = false;
+  mostrarModalExamen = false; 
+  guardandoExamen = false;
+  examenForm: FormGroup;      
+  
+  // Lista de Parámetros
+  mostrarModalListaParametros = false;
+  parametrosDelExamen: any[] = [];
+  cargandoParametros = false;
   examenSeleccionado: any = null;
+
+  // Formulario de Parámetros
+  mostrarModalParametro = false;
+  guardandoParametroState = false;
+  modoEdicionParametro = false;
+  parametroEditandoId: number | null = null;
   parametroForm: FormGroup;
 
-  // Sistema de Notificaciones Flotante
-  notificacion: any = null;
-
-  constructor() {
+  constructor(
+    private catalogoService: CatalogoService,
+    private fb: FormBuilder,
+    private messageService: MessageService
+  ) {
     this.examenForm = this.fb.group({
-      codigo: ['', Validators.required],
+      codigo: ['', [Validators.required, Validators.maxLength(10)]],
       descripcion: ['', Validators.required],
-      tipoTuboDefecto: ['', Validators.required],
-      precioBase: [null, [Validators.required, Validators.min(0.1)]]
+      tipoTuboDefecto: ['SUERO', Validators.required],
+      precioBase: [0, [Validators.required, Validators.min(0)]]
     });
 
     this.parametroForm = this.fb.group({
@@ -44,89 +67,158 @@ export class CatalogoComponent implements OnInit {
       unidad: [''],
       valorMin: [0, Validators.required],
       valorMax: [0, Validators.required],
-      sexoAplica: ['A', Validators.required] 
+      sexoAplica: ['A', Validators.required]
     });
   }
 
-  ngOnInit() {
-    this.cargarCatalogo();
+  ngOnInit(): void {
+    this.cargarExamenes();
   }
 
-  // Método unificado para alertas elegantes sin bloquear la UI
-  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' | 'advertencia' = 'exito') {
-    this.notificacion = { mensaje, tipo };
-    setTimeout(() => {
-      this.notificacion = null;
-    }, 4000);
-  }
-
-  cargarCatalogo() {
-    this.cargando = true;
+  cargarExamenes() {
+    this.cargandoExamenes = true;
     this.catalogoService.listarExamenes().subscribe({
       next: (data) => {
         this.examenes = data;
-        this.cargando = false;
+        this.cargandoExamenes = false;
       },
-      error: (err) => {
-        console.error('Error al cargar catálogo', err);
-        this.mostrarNotificacion("Error al conectar con el catálogo de exámenes.", "error");
-        this.examenes = [];
-        this.cargando = false;
+      error: () => {
+        this.mostrarNotificacion('Error', 'No se pudieron cargar los exámenes del catálogo', 'error');
+        this.cargandoExamenes = false;
       }
     });
   }
 
-  abrirModalNuevo() {
-    this.examenForm.reset();
+  abrirModalNuevoExamen() {
+    this.examenForm.reset({ tipoTuboDefecto: 'SUERO', precioBase: 0 });
+    this.guardandoExamen = false;
     this.mostrarModalExamen = true;
   }
 
   guardarExamen() {
-    if (this.examenForm.invalid) return;
+    if (this.examenForm.invalid) {
+      this.mostrarNotificacion('Atención', 'Complete todos los campos del examen', 'warn');
+      return;
+    }
 
-    this.guardando = true;
-    const request = this.examenForm.value;
-
-    this.catalogoService.crearExamen(request).subscribe({
-      next: (res) => {
+    this.guardandoExamen = true;
+    this.catalogoService.crearExamen(this.examenForm.value).subscribe({
+      next: () => {
+        this.mostrarNotificacion('Éxito', 'Examen añadido al catálogo', 'success');
         this.mostrarModalExamen = false;
-        this.guardando = false;
-        this.cargarCatalogo(); 
-        this.mostrarNotificacion(`Examen ${request.codigo} creado con éxito.`, "exito");
+        this.cargarExamenes();
       },
       error: (err) => {
-        console.error('Error al crear', err);
-        this.mostrarNotificacion("Ocurrió un error. Verifique que el código no esté duplicado.", "error");
-        this.guardando = false;
+        const msg = err.error || 'No se pudo registrar el examen.';
+        this.mostrarNotificacion('Error', msg, 'error');
+        this.guardandoExamen = false;
       }
     });
   }
 
-  abrirModalParametro(examen: any) {
+  verParametros(examen: any) {
     this.examenSeleccionado = examen;
-    this.parametroForm.reset({
-      valorMin: 0,
-      valorMax: 0,
-      sexoAplica: 'A'
+    this.mostrarModalListaParametros = true;
+    this.cargarParametros(examen.idExamen);
+  }
+
+  cargarParametros(idExamen: number) {
+    this.cargandoParametros = true;
+    this.catalogoService.obtenerParametrosDeExamen(idExamen).subscribe({
+      next: (data) => {
+        this.parametrosDelExamen = data;
+        this.cargandoParametros = false;
+      },
+      error: () => {
+        this.mostrarNotificacion('Error', 'No se pudieron cargar los parámetros', 'error');
+        this.cargandoParametros = false;
+      }
     });
+  }
+
+  abrirModalNuevoParametro(examen: any = null) {
+    if (examen) this.examenSeleccionado = examen;
+    this.modoEdicionParametro = false;
+    this.parametroEditandoId = null;
+    this.parametroForm.reset({ sexoAplica: 'A', valorMin: 0, valorMax: 0 });
+    this.mostrarModalParametro = true;
+  }
+
+  editarParametro(parametro: any) {
+    this.modoEdicionParametro = true;
+    this.parametroEditandoId = parametro.idParametro;
+    
+    this.parametroForm.patchValue({
+      nombre: parametro.nombre,
+      unidad: parametro.unidad,
+      valorMin: parametro.rangoMin, 
+      valorMax: parametro.rangoMax,
+      sexoAplica: parametro.sexoAplica || 'A'
+    });
+    
     this.mostrarModalParametro = true;
   }
 
   guardarParametro() {
-    if (this.parametroForm.invalid) return;
+    if (this.parametroForm.invalid) {
+      this.mostrarNotificacion('Atención', 'Complete los campos obligatorios del parámetro', 'warn');
+      return;
+    }
+    
+    this.guardandoParametroState = true;
 
-    this.guardando = true;
-    this.catalogoService.agregarParametro(this.examenSeleccionado.idExamen, this.parametroForm.value).subscribe({
-      next: () => {
-        this.mostrarModalParametro = false;
-        this.guardando = false;
-        this.mostrarNotificacion("Parámetro biológico agregado correctamente.", "exito");
-      },
-      error: (err) => {
-        console.error('Error al guardar parámetro', err);
-        this.mostrarNotificacion("Error de servidor al guardar el parámetro.", "error");
-        this.guardando = false;
-      }
-    });
+    if (this.modoEdicionParametro && this.parametroEditandoId) {
+      this.catalogoService.actualizarParametro(this.parametroEditandoId, this.parametroForm.value).subscribe({
+        next: () => {
+          this.mostrarNotificacion('Éxito', 'Parámetro actualizado', 'success');
+          this.cerrarModalFormParametro();
+          this.cargarParametros(this.examenSeleccionado.idExamen);
+        },
+        error: () => { 
+          this.mostrarNotificacion('Error', 'Error al actualizar el parámetro', 'error'); 
+          this.guardandoParametroState = false;
+        }
+      });
+    } else {
+      this.catalogoService.agregarParametroAExamen(this.examenSeleccionado.idExamen, this.parametroForm.value).subscribe({
+        next: () => {
+          this.mostrarNotificacion('Éxito', 'Parámetro agregado', 'success');
+          this.cerrarModalFormParametro();
+          if (this.mostrarModalListaParametros) {
+             this.cargarParametros(this.examenSeleccionado.idExamen);
+          }
+        },
+        error: () => { 
+          this.mostrarNotificacion('Error', 'Error al guardar el parámetro', 'error'); 
+          this.guardandoParametroState = false;
+        }
+      });
+    }
+  }
+
+  eliminarParametro(idParametro: number, nombre: string) {
+    const confirmar = confirm(`¿Estás seguro de eliminar el parámetro "${nombre}"?`);
+    
+    if (confirmar) {
+      this.catalogoService.eliminarParametro(idParametro).subscribe({
+        next: () => {
+          this.mostrarNotificacion('Eliminado', 'Parámetro eliminado', 'success');
+          this.cargarParametros(this.examenSeleccionado.idExamen);
+        },
+        error: (err) => {
+          const mensajeError = err.error || 'No se pudo eliminar, está en uso.';
+          this.mostrarNotificacion('Acción Denegada', mensajeError, 'error');
+        }
+      });
+    }
+  }
+
+  cerrarModalFormParametro() {
+    this.mostrarModalParametro = false;
+    this.guardandoParametroState = false;
+  }
+
+  mostrarNotificacion(titulo: string, mensaje: string, tipo: 'success' | 'error' | 'warn' | 'info') {
+    this.messageService.add({ severity: tipo, summary: titulo, detail: mensaje, life: 4000 });
   }
 }

@@ -14,4 +14,5 @@ public interface ParametrosClinicosRepository extends JpaRepository<ParametrosCl
 
     @Query("SELECT p FROM ParametrosClinicos p WHERE p.examen.oid_examen = :idExamen")
     List<ParametrosClinicos> findByExamen_Oid_examen(@Param("idExamen") Integer idExamen);
+
 }

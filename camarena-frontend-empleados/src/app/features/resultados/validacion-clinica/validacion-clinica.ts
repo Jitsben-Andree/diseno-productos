@@ -13,105 +13,110 @@ import { forkJoin } from 'rxjs';
 export class ValidacionClinicaComponent implements OnInit {
   private resultadosService = inject(ResultadosService);
 
-  // Estados de la vista
   tubosPendientes: any[] = [];
   tuboSeleccionado: any = null;
   parametrosClinicos: any[] = [];
   procesando = false;
-
-  // Sistema de Notificaciones Flotante
-  notificacion: any = null;
+  notificacion: { tipo: 'exito' | 'error' | 'advertencia'; mensaje: string } | null = null;
 
   ngOnInit() {
     this.cargarBandejaEntrada();
   }
 
-  mostrarNotificacion(mensaje: string, tipo: 'exito' | 'error' | 'advertencia' = 'exito') {
-    this.notificacion = { mensaje, tipo };
-    setTimeout(() => {
-      this.notificacion = null;
-    }, 4500); // Se esconde tras 4.5 segundos
+  mostrarNotificacion(tipo: 'exito' | 'error' | 'advertencia', mensaje: string) {
+    this.notificacion = { tipo, mensaje };
+    setTimeout(() => (this.notificacion = null), 4500);
   }
 
   cargarBandejaEntrada() {
-    // Petición al backend (Spring Boot) para traer los tubos pendientes
-    this.resultadosService.obtenerParametrosPendientes().subscribe({
-      next: (data) => {
-        this.tubosPendientes = data;
-      },
+    this.resultadosService.listarTubosPendientes().subscribe({
+      next: (data) => (this.tubosPendientes = data),
       error: (err) => {
-        console.error('Error al cargar la bandeja de entrada:', err);
-        this.mostrarNotificacion("Error al conectar con la bandeja de muestras del servidor.", "error");
-        this.tubosPendientes = [];
+        console.error('Error en bandeja:', err);
+        this.mostrarNotificacion('error', 'Error al conectar con la bandeja de muestras.');
       }
     });
   }
 
   seleccionarTubo(tubo: any) {
     this.tuboSeleccionado = tubo;
-    this.parametrosClinicos = []; // Limpiamos la tabla anterior mientras carga
-    
-    const idDetalle = tubo.idDetalleOrden || tubo.idMuestra; 
-    
-    this.resultadosService.obtenerResultadosDeExamen(idDetalle).subscribe({
-      next: (parametros) => {
-        this.parametrosClinicos = parametros;
-      },
-      error: (err) => {
-        console.error('Error al cargar los parámetros clínicos:', err);
-        this.mostrarNotificacion("No se pudieron extraer los parámetros de este examen.", "error");
-      }
+    this.parametrosClinicos = [];
+    const idDetalle = tubo.idDetalleOrden || tubo.idMuestra;
+
+    this.resultadosService.obtenerParametrosDeExamen(idDetalle).subscribe({
+      next: (parametros) => (this.parametrosClinicos = parametros),
+      error: (err) => this.mostrarNotificacion('error', 'No se pudieron extraer los parámetros.')
     });
   }
 
+  esFueraDeRango(param: any): boolean {
+    if (param.valorObtenido === null || param.valorObtenido === undefined || param.valorObtenido === '') return false;
+    const valor = parseFloat(param.valorObtenido);
+    return valor < parseFloat(param.rangoMin) || valor > parseFloat(param.rangoMax);
+  }
+
   aprobarResultados() {
-    // 1. Validar que no haya campos vacíos
-    const faltanDatos = this.parametrosClinicos.some(p => p.valorObtenido === null || p.valorObtenido === undefined || p.valorObtenido === '');
+    const faltanDatos = this.parametrosClinicos.some(
+      (p) => p.valorObtenido === null || p.valorObtenido === undefined || p.valorObtenido === ''
+    );
+    
     if (faltanDatos) {
-      this.mostrarNotificacion("Operación denegada: Ingrese todos los valores antes de firmar el examen.", "advertencia");
+      this.mostrarNotificacion('advertencia', 'Ingrese todos los valores antes de firmar.');
       return;
     }
 
     this.procesando = true;
 
-    // 2. Preparar todas las peticiones HTTP (una por cada parámetro)
-    const peticionesGuardado = this.parametrosClinicos.map(p => {
-      const request = {
+    // Guardar los resultados ingresados
+    const peticiones = this.parametrosClinicos.map((p) => {
+      return this.resultadosService.ingresarValorAnalitico({
         idDetalleOrden: this.tuboSeleccionado.idDetalleOrden || this.tuboSeleccionado.idMuestra,
         idParametro: p.idParametro || p.id,
         valorObtenido: p.valorObtenido
-      };
-      return this.resultadosService.ingresarValor(request);
+      });
     });
 
-    // 3. Ejecutar todas las peticiones en paralelo (forkJoin)
-    forkJoin(peticionesGuardado).subscribe({
+    forkJoin(peticiones).subscribe({
       next: () => {
-        // 4. Si todo se guardó bien, aprobamos la orden y generamos el PDF
         const idOrden = this.tuboSeleccionado.idOrdenReal || this.tuboSeleccionado.idOrden;
-        
+
+        // 🔥 Ejecutar la aprobación y recibir el Blob del PDF
         this.resultadosService.aprobarYGenerarPdf(idOrden).subscribe({
-          next: (res) => {
-            // Quitamos el tubo de la bandeja
-            this.tubosPendientes = this.tubosPendientes.filter(t => t.idMuestra !== this.tuboSeleccionado.idMuestra);
+          next: (pdfBlob: Blob) => {
             
-            this.mostrarNotificacion("Resultados firmados exitosamente. PDF generado en la nube.", "exito");
+            // 1. Crear URL temporal del archivo en la memoria del navegador
+            const url = window.URL.createObjectURL(pdfBlob);
             
-            // Limpiamos la pantalla derecha
+            // 2. Crear un enlace <a> oculto y hacer clic en él para descargar
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Resultados_${idOrden}.pdf`; // Nombre del archivo
+            document.body.appendChild(a);
+            a.click();
+            
+            // 3. Limpiar memoria y el DOM
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            // 4. Actualizar la vista (Bandeja limpia y notificación de éxito)
+            this.tubosPendientes = this.tubosPendientes.filter(
+              (t) => t.idMuestra !== this.tuboSeleccionado.idMuestra
+            );
+            this.mostrarNotificacion('exito', 'Resultados firmados. El PDF se ha descargado correctamente.');
             this.tuboSeleccionado = null;
             this.parametrosClinicos = [];
             this.procesando = false;
           },
           error: (err) => {
-            console.error("Error al aprobar la orden", err);
-            this.mostrarNotificacion("Valores guardados, pero el motor PDF no respondió.", "advertencia");
+            console.error('Error al generar PDF:', err);
+            this.mostrarNotificacion('error', 'Se guardaron los datos pero falló la generación del PDF.');
             this.procesando = false;
           }
         });
       },
       error: (err) => {
-        console.error("Error al guardar valores individuales", err);
-        this.mostrarNotificacion("Error crítico al intentar guardar los resultados en la base de datos.", "error");
+        console.error('Error al guardar valores', err);
+        this.mostrarNotificacion('error', 'Error al guardar los resultados analíticos.');
         this.procesando = false;
       }
     });

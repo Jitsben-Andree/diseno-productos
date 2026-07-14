@@ -2,20 +2,8 @@ package com.clinica.camarenabackend.services.impl;
 
 import com.clinica.camarenabackend.dtos.response.MuestraResponse;
 import com.clinica.camarenabackend.services.interfaces.MuestraService;
-
-import com.clinica.camarenabackend.models.entities.OrdenLaboratorio;
-import com.clinica.camarenabackend.models.entities.DetalleOrden;
-import com.clinica.camarenabackend.models.entities.MuestraClinica;
-import com.clinica.camarenabackend.models.entities.ExamenInsumo;
-import com.clinica.camarenabackend.models.entities.InventarioInsumos;
-import com.clinica.camarenabackend.models.entities.CatalogoExamenes;
-import com.clinica.camarenabackend.models.entities.Paciente;
-
-import com.clinica.camarenabackend.repositories.OrdenLaboratorioRepository;
-import com.clinica.camarenabackend.repositories.DetalleOrdenRepository;
-import com.clinica.camarenabackend.repositories.MuestraClinicaRepository;
-import com.clinica.camarenabackend.repositories.ExamenInsumoRepository;
-import com.clinica.camarenabackend.repositories.InventarioInsumosRepository;
+import com.clinica.camarenabackend.models.entities.*;
+import com.clinica.camarenabackend.repositories.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,16 +19,12 @@ public class MuestraServiceImpl implements MuestraService {
 
     @Autowired
     private OrdenLaboratorioRepository ordenRepository;
-
     @Autowired
     private DetalleOrdenRepository detalleOrdenRepository;
-
     @Autowired
     private MuestraClinicaRepository muestraRepository;
-
     @Autowired
     private ExamenInsumoRepository examenInsumoRepository;
-
     @Autowired
     private InventarioInsumosRepository inventarioRepository;
 
@@ -50,12 +34,9 @@ public class MuestraServiceImpl implements MuestraService {
         OrdenLaboratorio orden = ordenRepository.findById(idOrden)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
 
-        // 1. SOLUCIÓN AL ERROR 403 (Duplicados):
-        // Verificamos si esta orden ya tiene muestras generadas previamente
+        // Verificamos si esta orden ya tiene muestras generadas (Evitar duplicados)
         List<MuestraClinica> muestrasExistentes = muestraRepository.findByDetalleOrden_Orden_Oid_orden(idOrden);
-
         if (!muestrasExistentes.isEmpty()) {
-            // Si ya existen, simplemente las devolvemos para que el técnico continúe su trabajo
             return muestrasExistentes.stream().map(this::mapearAResponse).collect(Collectors.toList());
         }
 
@@ -78,7 +59,6 @@ public class MuestraServiceImpl implements MuestraService {
             MuestraClinica muestraGuardada = muestraRepository.save(nuevaMuestra);
             respuestas.add(mapearAResponse(muestraGuardada));
         }
-
         return respuestas;
     }
 
@@ -92,10 +72,7 @@ public class MuestraServiceImpl implements MuestraService {
             throw new RuntimeException("Esta muestra ya fue procesada o tomada.");
         }
 
-        // Marcar como tomada
-        muestra.setOestadoMuestra("TOMADA");
-
-        // Descontar Inventario Automáticamente
+        // 1. DESCUENTO AUTOMÁTICO DE INVENTARIO
         CatalogoExamenes examen = muestra.getDetalleOrden().getExamen();
         List<ExamenInsumo> recetaInsumos = examenInsumoRepository.findByExamen_Oid_examen(examen.getOid_examen());
 
@@ -103,6 +80,7 @@ public class MuestraServiceImpl implements MuestraService {
             InventarioInsumos insumo = receta.getInsumo();
             int nuevoStock = insumo.getOstockActual() - receta.getOcantidadRequerida().intValue();
 
+            // Si no hay stock, se aborta toda la transacción y el frontend muestra el error rojo
             if (nuevoStock < 0) {
                 throw new RuntimeException("Error: Stock insuficiente para el insumo: " + insumo.getOnombreInsumo());
             }
@@ -111,15 +89,16 @@ public class MuestraServiceImpl implements MuestraService {
             inventarioRepository.save(insumo);
         }
 
-        // Cambiamos el estado del detalle de la orden a EN_PROCESO
+        // 2. ACTUALIZACIÓN DE ESTADOS
+        muestra.setOestadoMuestra("TOMADA");
+
         DetalleOrden detalle = muestra.getDetalleOrden();
         detalle.setOestadoExamen("EN_PROCESO");
         detalleOrdenRepository.save(detalle);
 
         MuestraClinica muestraActualizada = muestraRepository.save(muestra);
 
-        // 2. SOLUCIÓN AL BUCLE DE ESPERA:
-        // Verificamos si, con esta muestra que acabamos de tomar, el paciente ya completó TODOS sus tubos
+        // 3. VERIFICAR SI EL PACIENTE COMPLETÓ TODA LA EXTRACCIÓN
         UUID idOrden = detalle.getOrden().getOid_orden();
         List<MuestraClinica> todasLasMuestras = muestraRepository.findByDetalleOrden_Orden_Oid_orden(idOrden);
 
@@ -127,9 +106,8 @@ public class MuestraServiceImpl implements MuestraService {
                 .allMatch(m -> m.getOestadoMuestra().equals("TOMADA"));
 
         if (todasTomadas) {
-            // Si ya se sacaron todos los tubos, cambiamos la Orden General de estado
             OrdenLaboratorio orden = detalle.getOrden();
-            orden.setOestadoGeneral("MUESTRAS_TOMADAS"); // Esto hace que ya no aparezca en "En Espera"
+            orden.setOestadoGeneral("MUESTRAS_TOMADAS"); // Sale del tablero de espera
             ordenRepository.save(orden);
         }
 

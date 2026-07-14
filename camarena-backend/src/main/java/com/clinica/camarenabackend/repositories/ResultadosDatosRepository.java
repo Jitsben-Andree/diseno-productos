@@ -12,7 +12,11 @@ import java.util.UUID;
 @Repository
 public interface ResultadosDatosRepository extends JpaRepository<ResultadosDatos, UUID> {
 
-    // Para listar todos los resultados ingresados de un examen específico (detalle)
+    // El que ya tenías: Para listar todos los resultados ingresados de un examen específico (detalle)
     @Query("SELECT r FROM ResultadosDatos r WHERE r.detalleOrden.oid_detalle = :idDetalle")
     List<ResultadosDatos> findByDetalleOrden_Oid_detalle(@Param("idDetalle") UUID idDetalle);
+
+    // 🔥 EL NUEVO: Para traer TODOS los resultados de todos los detalles vinculados a una orden completa
+    @Query("SELECT r FROM ResultadosDatos r WHERE r.detalleOrden.orden.oid_orden = :idOrden")
+    List<ResultadosDatos> buscarResultadosPorOrden(@Param("idOrden") UUID idOrden);
 }

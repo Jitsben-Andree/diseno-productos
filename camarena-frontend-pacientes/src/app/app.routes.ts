@@ -1,40 +1,40 @@
 import { Routes } from '@angular/router';
-import { LoginDni } from './features/login-dni/login-dni';
-import { AppLayout } from './layout/app-layout/app-layout';
-// import { authDniGuard } from './core/guards/auth-dni.guard';
 
 export const routes: Routes = [
+  // 1. Pantalla de Entrada (Fuera del Layout)
   { 
-    path: 'acceso', 
-    component: LoginDni
+    path: 'login-dni', 
+    loadComponent: () => import('./features/login-dni/login-dni').then(m => m.LoginDniComponent) 
   },
+  
+  // 2. Rutas Internas (Dentro del Layout con Barra Inferior)
   {
     path: '',
-    component: AppLayout,
-    // canActivate: [authDniGuard],
+    loadComponent: () => import('./layout/app-layout/app-layout').then(m => m.AppLayout),
     children: [
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { 
-        path: 'inicio', 
-        loadComponent: () => import('./features/dashboard-paciente/dashboard-paciente').then(m => m.DashboardPaciente)
+        path: 'dashboard-paciente', 
+        loadComponent: () => import('./features/dashboard-paciente/dashboard-paciente').then(m => m.DashboardPacienteComponent) 
       },
-      { 
-        path: 'historial', 
-        loadComponent: () => import('./features/historial-clinico/historial-clinico').then(m => m.HistorialClinico)
-      },
-      { 
-        path: 'resultados/:id', 
-        loadComponent: () => import('./features/visor-pdf/visor-pdf').then(m => m.VisorPdf)
-      },
-      { 
-        path: 'agendar', 
-        loadComponent: () => import('./features/agendamiento-online/agendamiento-online').then(m => m.AgendamientoOnline)
-      },
-      { 
-        path: 'familia', 
-        loadComponent: () => import('./features/grupo-familiar/grupo-familiar').then(m => m.GrupoFamiliar)
-      }
+      // PRÓXIMOS PASOS (Punto 4)
+      // { 
+      //   path: 'historial-clinico', 
+      //   loadComponent: () => import('./features/historial-clinico/historial-clinico.component').then(m => m.HistorialClinicoComponent) 
+      // },
+      // { 
+      //   path: 'grupo-familiar', 
+      //   loadComponent: () => import('./features/grupo-familiar/grupo-familiar.component').then(m => m.GrupoFamiliarComponent) 
+      // },
+      { path: '', redirectTo: 'dashboard-paciente', pathMatch: 'full' }
     ]
   },
-  { path: '**', redirectTo: 'acceso' }
+
+  // 3. El Visor de PDF ocupa toda la pantalla (Suele ir fuera del Layout del menú inferior por comodidad de lectura)
+  { 
+    path: 'visor-pdf', 
+    loadComponent: () => import('./features/visor-pdf/visor-pdf').then(m => m.VisorPdf) 
+  },
+
+  // 4. Ruta comodín por si escriben una URL que no existe
+  { path: '**', redirectTo: 'login-dni' }
 ];

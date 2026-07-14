@@ -1,156 +1,167 @@
-<div class="p-6 bg-gray-50 min-h-screen">
-  
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-800">Catálogo Científico y Tarifario</h1>
-      <p class="text-gray-500 text-sm mt-1">Gestione los exámenes médicos, precios y tubos de laboratorio requeridos.</p>
+<p-toast></p-toast>
+
+<div class="catalogo-container">
+    <div class="header-section">
+        <div>
+            <h2>Catálogo de Análisis Clínicos</h2>
+            <p class="subtitle">Gestión de exámenes disponibles, precios de venta y rangos referenciales.</p>
+        </div>
+        <button pButton label="Nuevo Examen" icon="pi pi-plus" class="p-button-primary" (click)="abrirModalNuevoExamen()"></button>
     </div>
-    <button 
-      (click)="abrirModalNuevo()"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition-colors flex items-center">
-      <i class="pi pi-plus mr-2"></i>
-      Nuevo Examen
-    </button>
-  </div>
 
-  <!-- Tabla de Exámenes -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-    <p-table 
-      [value]="examenes" 
-      [paginator]="true" 
-      [rows]="10" 
-      [loading]="cargando"
-      styleClass="p-datatable-sm p-datatable-striped"
-      [tableStyle]="{ 'min-width': '50rem' }">
-      
-      <ng-template pTemplate="header">
-        <tr>
-          <th class="text-left text-gray-600 font-semibold p-3 w-32">Código</th>
-          <th class="text-left text-gray-600 font-semibold p-3">Descripción del Examen</th>
-          <th class="text-center text-gray-600 font-semibold p-3">Tubo Requerido</th>
-          <th class="text-right text-gray-600 font-semibold p-3">Precio Base</th>
-          <th class="text-center text-gray-600 font-semibold p-3">Inteligencia Clínica</th>
-        </tr>
-      </ng-template>
-      
-      <ng-template pTemplate="body" let-examen>
-        <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
-          <td class="p-3 text-blue-600 font-mono font-bold text-sm">{{ examen.codigo }}</td>
-          <td class="p-3 text-gray-800 font-medium">{{ examen.descripcion }}</td>
-          <td class="p-3 text-center">
-            <span class="px-2 py-1 rounded text-xs font-bold border"
-                  [ngClass]="{
-                    'bg-purple-50 text-purple-700 border-purple-200': examen.tipoTuboDefecto === 'LILA',
-                    'bg-red-50 text-red-700 border-red-200': examen.tipoTuboDefecto === 'ROJO',
-                    'bg-yellow-50 text-yellow-700 border-yellow-200': examen.tipoTuboDefecto === 'AMARILLO',
-                    'bg-blue-50 text-blue-700 border-blue-200': examen.tipoTuboDefecto === 'CELESTE'
-                  }">
-              {{ examen.tipoTuboDefecto }}
-            </span>
-          </td>
-          <td class="p-3 text-right font-bold text-verde-esmeralda">S/ {{ examen.precioBase | number:'1.2-2' }}</td>
-          <td class="p-3 text-center">
-            <button (click)="abrirModalParametro(examen)" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded transition-colors">
-              <i class="pi pi-sliders-h mr-1"></i> Parámetros
-            </button>
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="emptymessage">
-        <tr><td colspan="5" class="text-center p-8 text-gray-500">
-          <i class="pi pi-folder-open text-4xl mb-3 text-gray-300 block"></i>
-          El catálogo está vacío. Comience agregando un nuevo examen.
-        </td></tr>
-      </ng-template>
-    </p-table>
-  </div>
-
-  <!-- Modal: Crear Nuevo Examen -->
-  <p-dialog header="Registrar Nuevo Examen" [(visible)]="mostrarModalExamen" [modal]="true" [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
-    <form [formGroup]="examenForm" (ngSubmit)="guardarExamen()" class="mt-4">
-      
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Código Único</label>
-        <input type="text" formControlName="codigo" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none font-mono uppercase" placeholder="Ej. HEM-001">
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del Examen</label>
-        <input type="text" formControlName="descripcion" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none" placeholder="Ej. Hemograma Completo">
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 mb-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tubo a utilizar</label>
-          <select formControlName="tipoTuboDefecto" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none bg-white">
-            <option value="">Seleccione...</option>
-            <option value="LILA">Tubo Lila (EDTA)</option>
-            <option value="ROJO">Tubo Rojo (Suero)</option>
-            <option value="AMARILLO">Tubo Amarillo (Gel)</option>
-            <option value="CELESTE">Tubo Celeste (Citrato)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Precio (S/)</label>
-          <input type="number" formControlName="precioBase" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 outline-none font-bold text-verde-esmeralda">
-        </div>
-      </div>
-
-      <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
-        <button type="button" (click)="mostrarModalExamen = false" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded font-medium transition-colors">Cancelar</button>
-        <button type="submit" [disabled]="examenForm.invalid || guardando" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium disabled:opacity-50 transition-colors">
-          <span *ngIf="!guardando">Guardar Examen</span><span *ngIf="guardando">Guardando...</span>
-        </button>
-      </div>
-    </form>
-  </p-dialog>
-
-  <!-- ACTUALIZADO Modal: Agregar Parámetro -->
-  <p-dialog header="Agregar Parámetro Clínico" [(visible)]="mostrarModalParametro" [modal]="true" [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
-    <div class="mb-4 p-3 bg-blue-50 rounded border border-blue-100 text-sm">
-      Agregando a: <span class="font-bold text-blue-800">{{ examenSeleccionado?.descripcion }}</span>
+    <!-- TABLA DE EXÁMENES -->
+    <div class="card">
+        <p-table [value]="examenes" [loading]="cargandoExamenes" [tableStyle]="{'min-width': '60rem'}" styleClass="p-datatable-striped">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 150px;">Código</th>
+                    <th>Descripción / Nombre del Análisis</th>
+                    <th>Tubo por Defecto</th>
+                    <th>Precio Base</th>
+                    <th style="width: 180px; text-align: center;">Configuración</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-examen>
+                <tr>
+                    <td class="font-mono font-bold">{{examen.codigo}}</td>
+                    <td class="font-medium">{{examen.descripcion}}</td>
+                    <td><span class="badge-tubo">{{examen.tipoTuboDefecto}}</span></td>
+                    <td class="text-green font-bold">S/ {{examen.precioBase | number:'1.2-2'}}</td>
+                    <td style="text-align: center;">
+                        <button pButton label="Parámetros" icon="pi pi-list" class="p-button-sm p-button-outlined" (click)="verParametros(examen)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="empty-message">No se encontraron exámenes registrados en el catálogo clínico.</td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
-    
-    <form [formGroup]="parametroForm" (ngSubmit)="guardarParametro()">
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Parámetro</label>
-        <input type="text" formControlName="nombre" class="w-full px-3 py-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Ej. Glucosa Basal">
-      </div>
-      
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Unidad de Medida</label>
-        <input type="text" formControlName="unidad" class="w-full px-3 py-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Ej. mg/dL">
-      </div>
-
-      <!-- NUEVO: Rangos de Referencia -->
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Valor Mínimo</label>
-          <input type="number" formControlName="valorMin" class="w-full px-3 py-2 border border-gray-300 rounded outline-none focus:border-blue-500 text-blue-600 font-bold">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Valor Máximo</label>
-          <input type="number" formControlName="valorMax" class="w-full px-3 py-2 border border-gray-300 rounded outline-none focus:border-blue-500 text-red-600 font-bold">
-        </div>
-      </div>
-
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Aplica para sexo:</label>
-        <select formControlName="sexoAplica" class="w-full px-3 py-2 border border-gray-300 rounded outline-none focus:border-blue-500 bg-white">
-          <option value="A">Ambos (A)</option>
-          <option value="M">Masculino (M)</option>
-          <option value="F">Femenino (F)</option>
-        </select>
-      </div>
-
-      <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
-        <button type="button" (click)="mostrarModalParametro = false" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded font-medium transition-colors">Cancelar</button>
-        <button type="submit" [disabled]="parametroForm.invalid || guardando" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium disabled:opacity-50 transition-colors">
-          Agregar Parámetro
-        </button>
-      </div>
-    </form>
-  </p-dialog>
-
 </div>
+
+<!-- MODAL: NUEVO EXAMEN -->
+<p-dialog header="Registrar Nuevo Examen Clínico" [(visible)]="mostrarModalExamen" [modal]="true" [style]="{width: '500px'}" [resizable]="false">
+    <form [formGroup]="examenForm" (ngSubmit)="guardarExamen()" class="form-container">
+        
+        <div class="field">
+            <label for="ex_codigo">Código del Examen (Único) *</label>
+            <input id="ex_codigo" type="text" pInputText formControlName="codigo" placeholder="Ej: HEM001, GLU02" class="w-full uppercase" />
+        </div>
+
+        <div class="field">
+            <label for="ex_descripcion">Descripción / Nombre Completo *</label>
+            <input id="ex_descripcion" type="text" pInputText formControlName="descripcion" placeholder="Ej: Hemograma Completo" class="w-full" />
+        </div>
+
+        <div class="field">
+            <label for="ex_tubo">Tipo de Tubo Recomendado *</label>
+            <select id="ex_tubo" formControlName="tipoTuboDefecto" class="w-full form-select">
+                <option value="SUERO">Tubo Rojo / Amarillo (Suero)</option>
+                <option value="EDTA">Tubo Morado (EDTA - Hematología)</option>
+                <option value="CITRATO">Tubo Azul (Citrato de Sodio - Coagulación)</option>
+                <option value="HEPARINA">Tubo Verde (Heparina)</option>
+                <option value="ORINA">Frasco de Orina</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="ex_precio">Precio Base de Venta (S/) *</label>
+            <input id="ex_precio" type="number" pInputText formControlName="precioBase" class="w-full" step="0.10" min="0" />
+        </div>
+
+        <div class="dialog-footer">
+            <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text text-gray-600" (click)="mostrarModalExamen = false"></button>
+            <button pButton type="submit" label="Crear Examen" icon="pi pi-save" [loading]="guardandoExamen" [disabled]="examenForm.invalid"></button>
+        </div>
+    </form>
+</p-dialog>
+
+<!-- MODAL: LISTA DE PARÁMETROS -->
+<p-dialog [header]="'Parámetros del Análisis: ' + (examenSeleccionado?.descripcion || '')" [(visible)]="mostrarModalListaParametros" [modal]="true" [style]="{width: '75vw'}" [maximizable]="true">
+    <div class="flex-end mb-3">
+        <button pButton label="Agregar Parámetro Clínico" icon="pi pi-plus" class="p-button-success p-button-sm" (click)="abrirModalNuevoParametro()"></button>
+    </div>
+
+    <p-table [value]="parametrosDelExamen" [loading]="cargandoParametros" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Nombre del Parámetro</th>
+                <th>Unidad</th>
+                <th class="text-center">Rango Mínimo</th>
+                <th class="text-center">Rango Máximo</th>
+                <th>Sexo Aplicable</th>
+                <th class="text-center" style="width: 100px;">Acciones</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-parametro>
+            <tr>
+                <td class="font-semibold text-dark">{{parametro.nombre}}</td>
+                <td>{{parametro.unidad || 'N/A'}}</td>
+                <td class="text-center font-mono">{{parametro.rangoMin}}</td>
+                <td class="text-center font-mono">{{parametro.rangoMax}}</td>
+                <td>
+                    <span *ngIf="parametro.sexoAplica === 'A'"><i class="pi pi-users mr-1 text-gray"></i> Ambos</span>
+                    <span *ngIf="parametro.sexoAplica === 'M'"><i class="pi pi-mars mr-1 text-blue"></i> Masculino</span>
+                    <span *ngIf="parametro.sexoAplica === 'F'"><i class="pi pi-venus mr-1 text-pink"></i> Femenino</span>
+                </td>
+                <td class="text-center">
+                    <div class="flex-center gap-2">
+                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-warning" (click)="editarParametro(parametro)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="eliminarParametro(parametro.idParametro, parametro.nombre)"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="empty-message-large">
+                    <i class="pi pi-info-circle mb-2 icon-large"></i>
+                    Este análisis no tiene componentes o parámetros configurados todavía.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-dialog>
+
+<!-- MODAL: FORMULARIO PARÁMETRO -->
+<p-dialog [header]="modoEdicionParametro ? 'Modificar Parámetro Clínico' : 'Asignar Nuevo Parámetro'" [(visible)]="mostrarModalParametro" [modal]="true" [style]="{width: '450px'}" [draggable]="false">
+    <form [formGroup]="parametroForm" (ngSubmit)="guardarParametro()" class="form-container">
+        
+        <div class="field">
+            <label for="p_nombre">Nombre de la Determinación *</label>
+            <input id="p_nombre" type="text" pInputText formControlName="nombre" placeholder="Ej: Glucosa en ayunas" class="w-full" />
+        </div>
+
+        <div class="field">
+            <label for="p_unidad">Unidad de Medida</label>
+            <input id="p_unidad" type="text" pInputText formControlName="unidad" placeholder="Ej: mg/dL, mm3, %" class="w-full" />
+        </div>
+
+        <div class="flex-row gap-3">
+            <div class="field flex-1">
+                <label for="p_min">Valor Mínimo *</label>
+                <input id="p_min" type="number" pInputText formControlName="valorMin" class="w-full text-center font-mono" step="0.01" />
+            </div>
+            <div class="field flex-1">
+                <label for="p_max">Valor Máximo *</label>
+                <input id="p_max" type="number" pInputText formControlName="valorMax" class="w-full text-center font-mono" step="0.01" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="p_sexo">Restringir por Sexo Biológico *</label>
+            <select id="p_sexo" formControlName="sexoAplica" class="w-full form-select">
+                <option value="A">Ambos (Rango Universal)</option>
+                <option value="M">Masculino Exclusivamente</option>
+                <option value="F">Femenino Exclusivamente</option>
+            </select>
+        </div>
+
+        <div class="dialog-footer border-top">
+            <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text text-gray-600" (click)="cerrarModalFormParametro()"></button>
+            <button pButton type="submit" label="Guardar Cambios" icon="pi pi-check" [loading]="guardandoParametroState" [disabled]="parametroForm.invalid"></button>
+        </div>
+    </form>
+</p-dialog>

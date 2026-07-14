@@ -12,8 +12,8 @@ public interface ResultadosService {
     // 1. Guarda el valor en la base de datos
     ResultadoResponse ingresarValorAnalitico(IngresarResultadoRequest request);
 
-    // 2. Firma el documento y genera el PDF
-    void aprobarYGenerarPdf(UUID idOrden, String emailBiologo);
+    // 2. Firma el documento y genera el PDF. ¡Ahora retorna el archivo binario!
+    byte[] aprobarYGenerarPdf(UUID idOrden, String emailBiologo);
 
     // 3. Trae los tubos para la columna izquierda (El que te estaba dando el 403)
     List<TuboPendienteResponse> listarTubosPendientes();
