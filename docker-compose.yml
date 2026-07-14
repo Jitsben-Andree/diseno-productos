@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+
+  # 1. BASE DE DATOS POSTGRESQL
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: camarena-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: camarena_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dkjvx90dkjvx90} # Usa la contraseña del entorno o la por defecto
+    ports:
+      - "5433:5432" # Expuesto externamente al 5433 para no chocar con otro Postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - camarena-network
+
+
+  # 2. BACKEND SPRING BOOT (JAVA)
+  backend:
+    build:
+      context: ./camarena-backend
+      dockerfile: Dockerfile
+    container_name: camarena-backend
+    restart: always
+    ports:
+      - "8081:8081" # Nuevo puerto 8081
+    environment:
+      - PORT=8081
+      - DB_URL=jdbc:postgresql://postgres-db:5432/camarena_db
+      - DB_USER=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-dkjvx90dkjvx90}
+    depends_on:
+      - postgres-db
+    networks:
+      - camarena-network
+
+  # 3. FRONTEND EMPLEADOS (ANGULAR + NGINX)
+  frontend-empleados:
+    build:
+      context: ./camarena-frontend-empleados
+      dockerfile: Dockerfile
+    container_name: camarena-frontend-empleados
+    restart: always
+    ports:
+      - "4202:80" # Mapeado al puerto externo 4202
+    depends_on:
+      - backend
+    networks:
+      - camarena-network
+
+
+  # 4. FRONTEND PACIENTES (ANGULAR + NGINX)
+  frontend-pacientes:
+    build:
+      context: ./camarena-frontend-pacientes
+      dockerfile: Dockerfile
+    container_name: camarena-frontend-pacientes
+    restart: always
+    ports:
+      - "4203:80" # Mapeado al puerto externo 4203
+    depends_on:
+      - backend
+    networks:
+      - camarena-network
+
+volumes:
+  postgres_data:
+
+networks:
+  camarena-network:
+    driver: bridge
